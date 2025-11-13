@@ -1,0 +1,202 @@
+import React, { useEffect, useState } from "react";
+import PageMeta from "../../components/common/PageMeta";
+import DashboardMetricCard from "../../components/dashboard/DashboardMetricCard";
+import AccountDetailsCard from "../../components/dashboard/AccountDetailsCard";
+import BusinessDetailsCard from "../../components/dashboard/BusinessDetailsCard";
+
+interface WalletData {
+  mineWallet: number;
+  nodeWallet: number;
+  capitalWallet: number;
+  totalCredit: number;
+  totalDebit: number;
+}
+
+export default function Home() {
+  const [wallet, setWallet] = useState<WalletData>({
+    mineWallet: 0,
+    nodeWallet: 0,
+    capitalWallet: 0,
+    totalCredit: 0,
+    totalDebit: 0,
+  });
+
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // useEffect(() => {
+    
+  //   const fetchWalletData = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         "http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=0&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=NODE24212301"
+  //       );
+
+  //       const data = await response.json();
+
+  //       if (data.status === "SUCCESS" && data.data?.length > 0) {
+  //         const walletInfo = data.data[0];
+  //         setWallet({
+  //           mineWallet: walletInfo.mineWallet ?? 0,
+  //           nodeWallet: walletInfo.nodeWallet ?? 0,
+  //           capitalWallet: walletInfo.capitalWallet ?? 0,
+  //           totalCredit: walletInfo.totalCredit ?? 0,
+  //           totalDebit: walletInfo.totalDebit ?? 0,
+  //         });
+  //       } else {
+  //         console.warn("No wallet data found");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching wallet data:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchWalletData();
+  // }, []);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+    const nodeId = user?.nodeId;
+
+    if (nodeId) {
+      fetchWalletData(nodeId);
+    } else {
+      console.warn("No nodeId found in localStorage");
+      setLoading(false);
+    }
+  }, []);
+
+  const fetchWalletData = async (nodeId: string) => {
+    try {
+      const url = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=0&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=${nodeId}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.status === "SUCCESS" && data.data?.length > 0) {
+        const walletInfo = data.data[0];
+        setWallet({
+          mineWallet: walletInfo.mineWallet ?? 0,
+          nodeWallet: walletInfo.nodeWallet ?? 0,
+          capitalWallet: walletInfo.capitalWallet ?? 0,
+          totalCredit: walletInfo.totalCredit ?? 0,
+          totalDebit: walletInfo.totalDebit ?? 0,
+        });
+      } else {
+        console.warn("No wallet data found for node:", nodeId);
+      }
+    } catch (error) {
+      console.error("Error fetching wallet data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <PageMeta
+        title="StyloCoin Dashboard"
+        description="Affiliate and Mining Dashboard"
+      />
+
+      {/* Main Layout Container */}
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 text-gray-900 dark:text-white">
+        
+        {/* Header Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-b-2xl shadow-2xl">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-white mb-2">Welcome to StyloCoin</h1>
+              <p className="text-blue-100 dark:text-blue-200">Your Crypto Investment Dashboard</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-blue-200 dark:text-blue-300">Total Portfolio Value</p>
+              <p className="text-2xl font-bold text-white">
+                ${wallet.totalCredit.toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Scrollable Main Content */}
+        <main className="p-6">
+          <div className="grid grid-cols-12 gap-6">
+
+            {/* Wallet Section Header */}
+            <div className="col-span-12 mb-6">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                <svg className="w-6 h-6 mr-2 text-yellow-500 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z"/>
+                </svg>
+                Wallets
+              </h2>
+            </div>
+
+            {/* Wallet Cards */}
+            <div className="col-span-12 sm:col-span-6 lg:col-span-3">
+              <DashboardMetricCard
+                title="Mine Wallet"
+                amount={loading ? "Loading..." : wallet.mineWallet.toFixed(2)}
+                colorClass="bg-gradient-to-br from-orange-500 to-red-600"
+                isWallet={true}
+                walletIcon="mine"
+              />
+            </div>
+
+            <div className="col-span-12 sm:col-span-6 lg:col-span-3">
+              <DashboardMetricCard
+                title="Node Wallet"
+                amount={loading ? "Loading..." : wallet.nodeWallet.toFixed(2)}
+                colorClass="bg-gradient-to-br from-blue-500 to-indigo-600"
+                isWallet={true}
+                walletIcon="node"
+              />
+            </div>
+
+            <div className="col-span-12 sm:col-span-6 lg:col-span-3">
+              <DashboardMetricCard
+                title="Capital Wallet"
+                amount={loading ? "Loading..." : wallet.capitalWallet.toFixed(2)}
+                colorClass="bg-gradient-to-br from-green-500 to-emerald-600"
+                isWallet={true}
+                walletIcon="capital"
+              />
+            </div>
+
+            <div className="col-span-12 sm:col-span-6 lg:col-span-3">
+              <DashboardMetricCard
+                title="Total Credit / Debit"
+                amount={
+                  loading
+                    ? "Loading..."
+                    : `${wallet.totalCredit.toFixed(2)} / ${wallet.totalDebit.toFixed(2)}`
+                }
+                colorClass="bg-gradient-to-br from-purple-500 to-pink-600"
+                isWallet={true}
+                walletIcon="credit"
+              />
+            </div>
+
+            {/* Account & Business Details */}
+            <div className="col-span-12 mb-6 mt-8">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
+                <svg className="w-6 h-6 mr-2 text-blue-500 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"/>
+                </svg>
+                Account & Business Details
+              </h2>
+            </div>
+
+            <div className="col-span-12 lg:col-span-5">
+              <AccountDetailsCard />
+            </div>
+
+            <div className="col-span-12 lg:col-span-7">
+              <BusinessDetailsCard />
+            </div>
+          </div>
+        </main>
+      </div>
+    </>
+  );
+}

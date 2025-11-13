@@ -1,0 +1,128 @@
+# StyloCoin Environment Configuration Template
+# ===========================================
+# Rename this file to .env and update the values with your actual configuration
+
+# Application Environment
+VITE_APP_ENV=development
+VITE_APP_NAME=StyloCoin
+VITE_APP_VERSION=1.0.0
+
+# API Configuration
+VITE_API_BASE_URL=https://api.stylocoin.com
+VITE_API_VERSION=v1
+VITE_API_TIMEOUT=30000
+
+# Authentication & Security
+VITE_JWT_SECRET=your-jwt-secret-key-here
+VITE_ENCRYPTION_KEY=your-encryption-key-here
+VITE_SESSION_TIMEOUT=3600000
+
+# Blockchain & Wallet Configuration
+VITE_BLOCKCHAIN_NETWORK=mainnet
+VITE_WALLET_PROVIDER_URL=https://bsc-dataseed.binance.org
+VITE_CONTRACT_ADDRESS=0x0000000000000000000000000000000000000000
+
+# USDT Configuration
+VITE_USDT_CONTRACT_ADDRESS=0x55d398326f99059ff775485246999027b3197955
+VITE_USDT_DECIMALS=18
+VITE_USDT_SYMBOL=USDT
+
+# Payment Gateway
+VITE_PAYMENT_GATEWAY_URL=https://payment.stylocoin.com
+VITE_PAYMENT_GATEWAY_KEY=your-payment-gateway-key
+VITE_PAYMENT_GATEWAY_SECRET=your-payment-gateway-secret
+
+# Email Service
+VITE_EMAIL_SERVICE_URL=https://api.emailservice.com
+VITE_EMAIL_API_KEY=your-email-api-key
+VITE_EMAIL_FROM=noreply@stylocoin.com
+
+# SMS Service
+VITE_SMS_SERVICE_URL=https://api.smsservice.com
+VITE_SMS_API_KEY=your-sms-api-key
+VITE_SMS_SENDER_ID=STYLOCOIN
+
+# File Upload
+VITE_FILE_UPLOAD_URL=https://uploads.stylocoin.com
+VITE_MAX_FILE_SIZE=10485760
+VITE_ALLOWED_FILE_TYPES=jpg,jpeg,png,pdf,doc,docx
+
+# Analytics & Monitoring
+VITE_ANALYTICS_ID=your-analytics-id
+VITE_SENTRY_DSN=your-sentry-dsn
+VITE_GOOGLE_ANALYTICS_ID=your-ga-id
+
+# Feature Flags
+VITE_ENABLE_2FA=true
+VITE_ENABLE_KYC=true
+VITE_ENABLE_NOTIFICATIONS=true
+VITE_ENABLE_DARK_MODE=true
+
+# Development Tools
+VITE_ENABLE_DEVTOOLS=true
+VITE_LOG_LEVEL=debug
+VITE_MOCK_API=false
+
+# External Services
+VITE_COINMARKETCAP_API_KEY=your-coinmarketcap-api-key
+VITE_COINGECKO_API_KEY=your-coingecko-api-key
+VITE_BLOCKCHAIN_EXPLORER_URL=https://bscscan.com
+
+# Social Media & Marketing
+VITE_TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+VITE_DISCORD_WEBHOOK_URL=your-discord-webhook-url
+VITE_TWITTER_API_KEY=your-twitter-api-key
+
+# Security Headers
+VITE_CSP_POLICY="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+VITE_ALLOWED_ORIGINS=https://stylocoin.com,https://www.stylocoin.com
+
+# Rate Limiting
+VITE_RATE_LIMIT_REQUESTS=100
+VITE_RATE_LIMIT_WINDOW=900000
+
+# Cache Configuration
+VITE_CACHE_TTL=300000
+VITE_ENABLE_CACHE=true
+
+# Backup & Recovery
+VITE_BACKUP_ENCRYPTION_KEY=your-backup-encryption-key
+VITE_BACKUP_RETENTION_DAYS=30
+
+# Compliance & Legal
+VITE_PRIVACY_POLICY_URL=https://stylocoin.com/privacy
+VITE_TERMS_OF_SERVICE_URL=https://stylocoin.com/terms
+VITE_COOKIE_POLICY_URL=https://stylocoin.com/cookies
+
+# Support & Documentation
+VITE_SUPPORT_EMAIL=support@stylocoin.com
+VITE_SUPPORT_PHONE=+1-800-STYLOCOIN
+VITE_DOCUMENTATION_URL=https://docs.stylocoin.com
+VITE_API_DOCUMENTATION_URL=https://nere-postman.postman.co/workspace/e337d2b2-8b6a-4a9e-8afe-850ea9a0a501/collection/17765295-8900cdac-7ace-432c-8962-874811fe661a
+
+# WebSocket Configuration
+VITE_WS_URL=wss://ws.stylocoin.com
+VITE_WS_RECONNECT_INTERVAL=5000
+VITE_WS_MAX_RECONNECT_ATTEMPTS=5
+
+# Performance Optimization
+VITE_ENABLE_LAZY_LOADING=true
+VITE_ENABLE_CODE_SPLITTING=true
+VITE_BUNDLE_ANALYZER=false
+
+# Testing
+VITE_TEST_MODE=false
+VITE_MOCK_DATA=false
+VITE_TEST_USER_ID=test-user-123
+
+# Internationalization
+VITE_DEFAULT_LANGUAGE=en
+VITE_SUPPORTED_LANGUAGES=en,es,fr,de,zh,ja,ko
+VITE_CURRENCY_SYMBOL=USD
+VITE_DATE_FORMAT=MM/DD/YYYY
+VITE_TIMEZONE=UTC
+
+# Mobile App Configuration
+VITE_MOBILE_APP_VERSION=1.0.0
+VITE_MOBILE_APP_STORE_URL=https://apps.apple.com/app/stylocoin
+VITE_MOBILE_APP_PLAYSTORE_URL=https://play.google.com/store/apps/details?id=com.stylocoin.app
