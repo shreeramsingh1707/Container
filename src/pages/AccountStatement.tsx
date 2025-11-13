@@ -1,167 +1,218 @@
 import React, { useEffect, useState } from "react";
 
-const AccountDetailsCard: React.FC = () => {
-  const [users, setUsers] = useState<any[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<any[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
-  const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 10;
+interface AccountStatementRecord {
+  accountStatementPkId: number;
+  effectiveDateTime: string;
+  particular: string;
+  credit: number;
+  debit: number;
+}
 
-  // Fetch users once based on logged-in nodeId
+export default function AccountStatement() {
+  const [statementRecords, setStatementRecords] = useState<AccountStatementRecord[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
     const nodeId = user?.nodeId;
 
-    if (!nodeId) {
+    if (nodeId) {
+      fetchAccountStatement(nodeId);
+    } else {
       console.warn("No nodeId found in localStorage");
       setLoading(false);
-      return;
     }
-
-    const fetchData = async () => {
-      try {
-        const res = await fetch(
-          `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/users/getUser?page=0&size=50&filterBy=ACTIVE&inputPkId=null&inputFkId=${nodeId}`
-        );
-        const data = await res.json();
-
-        if (data.status === "SUCCESS" && Array.isArray(data.data)) {
-          setUsers(data.data);
-          setFilteredUsers(data.data);
-        }
-      } catch (err) {
-        console.error("Error fetching users:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
   }, []);
 
-  // Filter + Search logic
-  useEffect(() => {
-    let filtered = [...users];
+  const fetchAccountStatement = async (nodeId: string) => {
+    try {
+      const url = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getAccountStatement?page=0&size=50&filterBy=ACTIVE&inputPkId=null&inputFkId=${nodeId}`;
+      const res = await fetch(url);
+      const data = await res.json();
 
-    if (statusFilter !== "ALL") {
-      filtered = filtered.filter(
-        (u) => u.userStatus?.toLowerCase() === statusFilter.toLowerCase()
-      );
+      if (data.status === "SUCCESS" && Array.isArray(data.data)) {
+        setStatementRecords(data.data);
+      } else {
+        setStatementRecords([]);
+      }
+    } catch (err) {
+      console.error("Error fetching account statement:", err);
+      setStatementRecords([]);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    if (searchTerm.trim() !== "") {
-      filtered = filtered.filter(
-        (u) =>
-          u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          u.nodeId?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    setFilteredUsers(filtered);
-    setCurrentPage(1); // Reset to page 1 when filters change
-  }, [searchTerm, statusFilter, users]);
+  // Filter records by search term
+  const filteredRecords = statementRecords.filter((record) =>
+    record.particular?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Pagination
-  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredRecords.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const currentUsers = filteredUsers.slice(startIndex, startIndex + rowsPerPage);
+  const endIndex = startIndex + rowsPerPage;
+  const currentRecords = filteredRecords.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => setCurrentPage(page);
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-xl">
-      <h2 className="text-xl font-bold mb-4 text-gray-800 dark:text-white">
-        User Details
-      </h2>
-
-      {/* 🔍 Search and Filter Controls */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
-        <input
-          type="text"
-          placeholder="Search by name, email, or node ID..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="px-3 py-2 border rounded-md w-full md:w-1/3 dark:bg-gray-700 dark:text-white"
-        />
-
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white"
-        >
-          <option value="ALL">All</option>
-          <option value="ACTIVE">Active</option>
-          <option value="INACTIVE">Inactive</option>
-        </select>
+    <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 bg-gray-900 min-h-screen">
+      {/* Breadcrumb */}
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-title-md2 font-semibold text-white">A/c Statement</h2>
+        <nav>
+          <ol className="flex items-center gap-2">
+            <li><a className="font-medium text-gray-300 hover:text-white" href="/">Home /</a></li>
+            <li><a className="font-medium text-gray-300 hover:text-white" href="/">Financial /</a></li>
+            <li className="font-medium text-orange-500">A/c Statement</li>
+          </ol>
+        </nav>
       </div>
 
-      {/* 🧾 Table */}
-      {loading ? (
-        <p className="text-gray-500 dark:text-gray-300">Loading...</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full border-collapse border border-gray-300 dark:border-gray-700">
-            <thead className="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200">
-              <tr>
-                <th className="border p-2">Name</th>
-                <th className="border p-2">Email</th>
-                <th className="border p-2">Node ID</th>
-                <th className="border p-2">Status</th>
-                <th className="border p-2">Country</th>
-                <th className="border p-2">Date of Activation</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentUsers.map((u, i) => (
-                <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-600">
-                  <td className="border p-2">{u.name}</td>
-                  <td className="border p-2">{u.email}</td>
-                  <td className="border p-2 text-blue-600 dark:text-blue-400 font-semibold">
-                    {u.nodeId}
-                  </td>
-                  <td className="border p-2">{u.userStatus}</td>
-                  <td className="border p-2">{u.country}</td>
-                  <td className="border p-2">
-                    {u.dateOfActivation
-                      ? new Date(u.dateOfActivation).toLocaleString()
-                      : "N/A"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {/* Search + Filter Section */}
+      <div className="mb-6 bg-gray-800 rounded-xl border border-gray-700 p-6">
+        <div className="flex flex-col sm:flex-row gap-4 items-center">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search Particular"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-64 rounded-lg border-2 border-gray-600 bg-gray-700 py-3 pl-10 pr-4 text-white placeholder-gray-400 outline-none transition-all focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+            />
+            <svg
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          </div>
         </div>
-      )}
+      </div>
 
-      {/* 📄 Pagination */}
-      <div className="flex justify-between items-center mt-4">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
-        >
-          ‹ Prev
-        </button>
+      {/* Table */}
+      <div className="bg-gray-800 rounded-xl border border-gray-700 shadow-2xl overflow-hidden">
+        <div className="p-6 border-b border-gray-700">
+          <h3 className="text-white font-bold text-xl">Account Statement</h3>
+        </div>
 
-        <span className="text-gray-700 dark:text-gray-300">
-          Page {currentPage} of {totalPages || 1}
-        </span>
+        {loading ? (
+          <div className="py-12 text-center text-gray-400">Loading account statement...</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gradient-to-r from-gray-800 to-gray-750 border-b border-gray-700">
+                <tr>
+                  <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">#</th>
+                  <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Date</th>
+                  <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Particular</th>
+                  <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Cr.</th>
+                  <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Db.</th>
+                </tr>
+              </thead>
 
-        <button
-          onClick={() =>
-            setCurrentPage((prev) =>
-              Math.min(prev + 1, totalPages || prev)
-            )
-          }
-          disabled={currentPage === totalPages || totalPages === 0}
-          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded disabled:opacity-50"
-        >
-          Next ›
-        </button>
+              <tbody className="divide-y divide-gray-700">
+                {currentRecords.length > 0 ? (
+                  currentRecords.map((record, index) => (
+                    <tr key={record.accountStatementPkId} className="hover:bg-gray-700/50 transition-colors">
+                      <td className="py-4 px-6 text-white font-medium">{startIndex + index + 1}</td>
+                      <td className="py-4 px-6 text-gray-300">{formatDate(record.effectiveDateTime)}</td>
+                      <td className="py-4 px-6 text-white font-medium">{record.particular}</td>
+                      <td className="py-4 px-6">
+                        {record.credit > 0 ? (
+                          <span className="text-green-400 font-bold">
+                            ₹{record.credit.toFixed(2)}
+                          </span>
+                        ) : (
+                          <span className="text-gray-500">-</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-6">
+                        {record.debit > 0 ? (
+                          <span className="text-red-400 font-bold">
+                            ₹{record.debit.toFixed(2)}
+                          </span>
+                        ) : (
+                          <span className="text-gray-500">-</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="py-12 text-center text-gray-400">
+                      No records found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-6 py-4 border-t border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2 text-gray-400">
+              <span>Rows per page</span>
+              <input
+                type="number"
+                value={rowsPerPage}
+                onChange={(e) => {
+                  setRowsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
+                className="w-16 rounded border border-gray-600 bg-gray-700 px-2 py-1 text-white text-sm"
+                min="1"
+                max="100"
+              />
+              <span>Entries</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg border border-gray-600 bg-gray-700 text-gray-400 hover:text-white hover:bg-gray-600 disabled:opacity-50"
+              >
+                ‹
+              </button>
+              <span className="px-3 py-2 text-white font-medium">
+                {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg border border-gray-600 bg-gray-700 text-gray-400 hover:text-white hover:bg-gray-600 disabled:opacity-50"
+              >
+                ›
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default AccountDetailsCard;
+}
