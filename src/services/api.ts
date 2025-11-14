@@ -447,7 +447,7 @@ export interface ApproveTransactionRequest {
 export const usersApi = {
   // Get all users with pagination and filtering
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<UsersResponse> =>
-    apiCall<UsersResponse>(`/api/users/getUser?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`),
+    apiCall<UsersResponse>(`/api/users/getUser?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`),
  
   // Get user by userPkId
   getById: (userPkId: number, filterBy: string = 'ACTIVE'): Promise<User | null> =>
