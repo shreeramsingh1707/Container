@@ -111,9 +111,9 @@ const IncomeSummary: React.FC = () => {
       </div>
 
       {/* Table Section */}
-      <div className="bg-gray-900 p-4 rounded-lg">
-        <table className="w-full text-left">
-          <thead>
+      <div className="bg-gray-800 rounded-xl border border-gray-700 shadow-2xl overflow-hidden">
+      <table className="w-full">
+        <thead className="bg-gradient-to-r from-gray-800 to-gray-750 border-b border-gray-700">
             <tr className="border-b border-gray-700">
               <th className="p-2">#</th>
               <th className="p-2">Date</th>
@@ -122,7 +122,7 @@ const IncomeSummary: React.FC = () => {
             </tr>
           </thead>
 
-          <tbody>
+          <tbody className="divide-y divide-gray-700">
             {loading ? (
               <tr>
                 <td colSpan={4} className="text-center p-4">
@@ -138,10 +138,10 @@ const IncomeSummary: React.FC = () => {
             ) : (
               filteredData.map((item, index) => (
                 <tr key={item.incomeSummaryPkId} className="border-b border-gray-700">
-                  <td className="p-2">{index + 1}</td>
-                  <td className="p-2">{item.effectiveDateTime}</td>
-                  <td className="p-2">{item.transactionType}</td>
-                  <td className="p-2">₹ {item.bonusAmount}</td>
+                  <td className="py-4 px-6 text-white font-medium">{index + 1}</td>
+                  <td className="py-4 px-6 text-gray-300">{item.effectiveDateTime}</td>
+                  <td className="py-4 px-6 text-white font-medium">{item.transactionType}</td>
+                  <td className="py-4 px-6">₹ {item.bonusAmount}</td>
                 </tr>
               ))
             )}
