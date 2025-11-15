@@ -3,9 +3,62 @@ import { useSearchParams } from 'react-router';
 import PageMeta from '../../components/common/PageMeta';
 import UserManagementTable from '../../components/admin/UserManagementTable';
 import TransactionApprovalModal from '../../components/admin/TransactionApprovalModal';
-import { User, WalletData, usersApi, walletDataApi } from '../../services/api';
+//  import { User, WalletData, usersApi, walletDataApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+interface User {
+  userPkId: number;
+  versionId: string;
+  nodeId: string;
+  name: string;
+  email: string;
+  password: string;
+  country: string;
+  mobile: string;
+  referralCode: string;
+  position: string;
+  isUserIsAdmin: boolean;
+  roles: Array<{ roleId: number; name: string }>;
+  enabled: boolean;
+  authorities: Array<{ authority: string }>;
+  username: string;
+  accountNonExpired: boolean;
+  accountNonLocked: boolean;
+  credentialsNonExpired: boolean;
+  isDeleted: boolean;
+  isGenericFlag: boolean;
+  isConfirmed?: boolean; // User confirmation status for mining access
+  imageUrl?: string | null; // User profile image URL (deprecated, use profileImageUrl)
+  profileImageUrl?: string | null; // User profile image URL from API
+  imageId?: string | null; // User profile image ID
+  // Additional fields
+  notesG11nBigTxt?: string | null;
+  effectiveDateTime?: string;
+  saveStateCodeFkId?: string;
+  activeStateCodeFkId?: string;
+  recordStateCodeFkId?: string;
+  createdDatetime?: string;
+  lastModifiedDateTime?: string;
+}
 
+ interface WalletData {
+  walletPkId: number;
+  mineWallet: number;
+  nodeWallet: number;
+  capitalWallet: number;
+  totalCredit: number;
+  totalDebit: number;
+  userFkId: number;
+  userNodeCode?: string;
+  isGenericFlag?: boolean;
+  isDeleted?: boolean;
+  notesG11nBigTxt?: string | null;
+  effectiveDateTime?: string;
+  saveStateCodeFkId?: string;
+  activeStateCodeFkId?: string;
+  recordStateCodeFkId?: string;
+  createdDatetime?: string;
+  lastModifiedDateTime?: string;
+}
 export default function AdminUsers() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
@@ -33,98 +86,46 @@ export default function AdminUsers() {
         : statusFilter === "inactive"
         ? "INACTIVE"
         : null;
-      const [usersResponse, walletResponse] = await Promise.all([
-        usersApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null),
-        walletDataApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null)
-      ]);
+      // const [usersResponse, walletResponse] = await Promise.all([
+      //   usersApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null),
+        // walletDataApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null)
+      // ]);
+      let page=0;
+      let size=100;
       
-      let filteredUsers = usersResponse.data;
+      const url = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/users/getUser?page=0&size=25&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
+      const response = await fetch(url);
+      const data = await response.json();
       
-      // Apply filters
-      if (statusFilter === 'active') {
-        filteredUsers = filteredUsers.filter(user => user.enabled);
-        console.log("filteredUsers all is well",filteredUsers);
-      } else if (statusFilter === 'inactive') {
-        filteredUsers = filteredUsers.filter(user => !user.enabled);
-      }
-      
+      if (data.status === "SUCCESS" && data.data?.length > 0) {
+        const userData = data.data;
+        let  filteredUsers = userData;
+          
       if (roleFilter === 'admin') {
-        filteredUsers = filteredUsers.filter(user => 
-          user.roles?.some(role => role.name === 'ADMIN_USER')
+        filteredUsers = filteredUsers.filter(usr => 
+          usr.roles?.some(role => role.name === 'ADMIN_USER')
         );
       }
       
       setUsers(filteredUsers);
-      setWalletData(walletResponse.content);
+      }
+
+          const walletUrl =`http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=${page}&size=${size}&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
+           const walletResponse = await fetch(walletUrl);
+           const walletDdata = await response.json();
+
+      
+        if (walletDdata.status === "SUCCESS" && walletDdata.data?.length > 0) {
+        const userwalletData = walletDdata.data;
+          setWalletData(userwalletData);
+      }
+      
+    
+    
     } catch (error) {
       console.error('Error fetching data:', error);
       // Use mock data for development
-      setUsers([
-        {
-          userPkId: 1,
-          versionId: 'test-1',
-          nodeId: 'NODE001',
-          name: 'John Doe',
-          email: 'john@example.com',
-          password: '',
-          country: 'USA',
-          mobile: '1234567890',
-          referralCode: '',
-          position: 'Left',
-          isUserIsAdmin: false,
-          roles: [{ roleId: 502, name: 'NORMAL_USER' }],
-          enabled: true,
-          authorities: [{ authority: 'NORMAL_USER' }],
-          username: 'john@example.com',
-          accountNonExpired: true,
-          accountNonLocked: true,
-          credentialsNonExpired: true,
-          isDeleted: false,
-          isGenericFlag: false
-        },
-        {
-          userPkId: 2,
-          versionId: 'test-2',
-          nodeId: 'NODE002',
-          name: 'Jane Smith',
-          email: 'jane@example.com',
-          password: '',
-          country: 'Canada',
-          mobile: '0987654321',
-          referralCode: '',
-          position: 'Right',
-          isUserIsAdmin: true,
-          roles: [{ roleId: 501, name: 'ADMIN_USER' }],
-          enabled: true,
-          authorities: [{ authority: 'ADMIN_USER' }],
-          username: 'jane@example.com',
-          accountNonExpired: true,
-          accountNonLocked: true,
-          credentialsNonExpired: true,
-          isDeleted: false,
-          isGenericFlag: false
-        }
-      ]);
-      setWalletData([
-        {
-          walletPkId: 1,
-          mineWallet: 1000,
-          nodeWallet: 2000,
-          capitalWallet: 500,
-          totalCredit: 3500,
-          totalDebit: 0,
-          userFkId: 1
-        },
-        {
-          walletPkId: 2,
-          mineWallet: 2500,
-          nodeWallet: 1500,
-          capitalWallet: 1000,
-          totalCredit: 5000,
-          totalDebit: 500,
-          userFkId: 2
-        }
-      ]);
+     
     } finally {
       setIsLoading(false);
     }
@@ -206,7 +207,10 @@ export default function AdminUsers() {
         </div>
 
         {/* User Management Table */}
-        <UserManagementTable
+      <UserManagementTable
+          users={users}
+          walletData={walletData}
+          loading={isLoading}
           onTransactionApproval={handleTransactionApproval}
         />
 

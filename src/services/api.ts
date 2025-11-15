@@ -279,7 +279,7 @@ export const walletTransactionApi = {
     userNodeId?: string | null
   ): Promise<{ content: WalletTransaction[]; totalElements: number; count?: number }> =>
     apiCall<any>(
-      `/api/individual/getWalletTransaction?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`
+      `/api/individual/getWalletTransaction?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`
  
  
       // `/api/admin/getWalletTransaction?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`
@@ -614,7 +614,7 @@ export const depositFundApi = {
     userNodeId?: string | null
   ): Promise<{ content: DepositFundItem[]; totalElements: number; count?: number }> =>
     apiCall<any>(
-      `/api/individual/getIndividualDepositFund?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`
+      `/api/individual/getIndividualDepositFund?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`
     ).then((response) => ({
       content: response.data || [],
       totalElements: response.count || 0,
