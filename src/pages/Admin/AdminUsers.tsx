@@ -27,9 +27,15 @@ export default function AdminUsers() {
   const fetchData = async () => {
     try {
       setIsLoading(true);
+      const apiStatusFilter =
+      statusFilter === "active"
+        ? "ACTIVE"
+        : statusFilter === "inactive"
+        ? "INACTIVE"
+        : null;
       const [usersResponse, walletResponse] = await Promise.all([
-        usersApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null),
-        walletDataApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null)
+        usersApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null),
+        walletDataApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null)
       ]);
       
       let filteredUsers = usersResponse.data;
@@ -37,6 +43,7 @@ export default function AdminUsers() {
       // Apply filters
       if (statusFilter === 'active') {
         filteredUsers = filteredUsers.filter(user => user.enabled);
+        console.log("filteredUsers all is well",filteredUsers);
       } else if (statusFilter === 'inactive') {
         filteredUsers = filteredUsers.filter(user => !user.enabled);
       }

@@ -30,7 +30,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
     try {
       setIsLoading(true);
       const [usersResponse, walletResponse] = await Promise.all([
-        usersApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null),
+        usersApi.getAll(0, 100, 'ACTIVE', null),
         walletDataApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null)
       ]);
       
