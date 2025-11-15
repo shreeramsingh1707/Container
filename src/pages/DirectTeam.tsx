@@ -1,282 +1,23 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo ,useEffect} from "react";
 import { EyeIcon } from "../icons";
 import { Modal } from "../components/ui/modal";
 import { useModal } from "../hooks/useModal";
 
 interface TeamMember {
   id: number;
-  userId: string;
-  name: string;
-  miningPackage: string;
-  position: string;
   status: "Active" | "Inactive";
-  directTeam: number;
-  totalTeam: number;
-  directBusiness: string;
-  teamBusiness: string;
   rank: string;
-  joiningDate: string; // ISO or display-ready string
-  activationDate: string; // ISO or display-ready string
+  joiningDate: string;
+  activationDate: string;
   level?: number; // Hierarchy level
-  parentId?: number; // Parent member ID for hierarchy
+   parentId?: string; // Parent member ID for hierarchy
+  memberId: string,
+  memberName: string,
+  memberEmail: string,
+  memberLevel: number,
+  position: string
 }
 
-const sampleData: TeamMember[] = [
-  {
-    id: 4,
-    userId: "USR004",
-    name: "Pankaj Singh",
-    miningPackage: "Premium",
-    position: "Senior Lead",
-    status: "Active",
-    directTeam: 8,
-    totalTeam: 35,
-    directBusiness: "$2,100",
-    teamBusiness: "$8,750",
-    rank: "Platinum",
-    joiningDate: "2024-04-03",
-    activationDate: "2024-04-05",
-    level: 0 // Top level - ROOT
-  },
-  {
-    id: 1,
-    userId: "USR001",
-    name: "John Smith",
-    miningPackage: "Premium",
-    position: "Manager",
-    status: "Active",
-    directTeam: 5,
-    totalTeam: 25,
-    directBusiness: "$1,250",
-    teamBusiness: "$5,500",
-    rank: "Gold",
-    joiningDate: "2024-03-14",
-    activationDate: "2024-03-20",
-    level: 1,
-    parentId: 4 // LEFT child of Emily Wilson
-  },
-  {
-    id: 6,
-    userId: "USR006",
-    name: "Robert Taylor",
-    miningPackage: "Premium",
-    position: "Manager",
-    status: "Active",
-    directTeam: 4,
-    totalTeam: 18,
-    directBusiness: "$1,100",
-    teamBusiness: "$4,200",
-    rank: "Gold",
-    joiningDate: "2024-03-18",
-    activationDate: "2024-03-22",
-    level: 1,
-    parentId: 4 // RIGHT child of Emily Wilson
-  },
-  {
-    id: 2,
-    userId: "USR002",
-    name: "Sarah Johnson",
-    miningPackage: "Standard",
-    position: "Team Lead",
-    status: "Active",
-    directTeam: 3,
-    totalTeam: 12,
-    directBusiness: "$850",
-    teamBusiness: "$3,200",
-    rank: "Silver",
-    joiningDate: "2024-01-09",
-    activationDate: "2024-01-12",
-    level: 2,
-    parentId: 1 // LEFT child of John Smith
-  },
-  {
-    id: 5,
-    userId: "USR005",
-    name: "David Brown",
-    miningPackage: "Standard",
-    position: "Team Lead",
-    status: "Active",
-    directTeam: 2,
-    totalTeam: 6,
-    directBusiness: "$450",
-    teamBusiness: "$1,350",
-    rank: "Silver",
-    joiningDate: "2024-02-10",
-    activationDate: "2024-02-13",
-    level: 2,
-    parentId: 1 // RIGHT child of John Smith
-  },
-  {
-    id: 7,
-    userId: "USR007",
-    name: "Lisa Anderson",
-    miningPackage: "Standard",
-    position: "Team Lead",
-    status: "Active",
-    directTeam: 3,
-    totalTeam: 10,
-    directBusiness: "$750",
-    teamBusiness: "$2,800",
-    rank: "Silver",
-    joiningDate: "2024-02-15",
-    activationDate: "2024-02-18",
-    level: 2,
-    parentId: 6 // LEFT child of Robert Taylor
-  },
-  {
-    id: 8,
-    userId: "USR008",
-    name: "Michael Chen",
-    miningPackage: "Premium",
-    position: "Team Lead",
-    status: "Active",
-    directTeam: 2,
-    totalTeam: 8,
-    directBusiness: "$650",
-    teamBusiness: "$2,100",
-    rank: "Silver",
-    joiningDate: "2024-02-20",
-    activationDate: "2024-02-23",
-    level: 2,
-    parentId: 6 // RIGHT child of Robert Taylor
-  },
-  {
-    id: 3,
-    userId: "USR003",
-    name: "Mike Davis",
-    miningPackage: "Basic",
-    position: "Member",
-    status: "Active",
-    directTeam: 1,
-    totalTeam: 3,
-    directBusiness: "$200",
-    teamBusiness: "$600",
-    rank: "Bronze",
-    joiningDate: "2023-11-22",
-    activationDate: "2023-12-01",
-    level: 3,
-    parentId: 2 // LEFT child of Sarah Johnson
-  },
-  {
-    id: 9,
-    userId: "USR009",
-    name: "Jennifer White",
-    miningPackage: "Basic",
-    position: "Member",
-    status: "Active",
-    directTeam: 1,
-    totalTeam: 2,
-    directBusiness: "$180",
-    teamBusiness: "$500",
-    rank: "Bronze",
-    joiningDate: "2023-12-05",
-    activationDate: "2023-12-10",
-    level: 3,
-    parentId: 2 // RIGHT child of Sarah Johnson
-  },
-  {
-    id: 10,
-    userId: "USR010",
-    name: "James Miller",
-    miningPackage: "Basic",
-    position: "Member",
-    status: "Active",
-    directTeam: 1,
-    totalTeam: 2,
-    directBusiness: "$220",
-    teamBusiness: "$550",
-    rank: "Bronze",
-    joiningDate: "2024-01-15",
-    activationDate: "2024-01-18",
-    level: 3,
-    parentId: 5 // LEFT child of David Brown
-  },
-  {
-    id: 11,
-    userId: "USR011",
-    name: "Patricia Martinez",
-    miningPackage: "Standard",
-    position: "Member",
-    status: "Active",
-    directTeam: 0,
-    totalTeam: 1,
-    directBusiness: "$150",
-    teamBusiness: "$400",
-    rank: "Bronze",
-    joiningDate: "2024-01-20",
-    activationDate: "2024-01-25",
-    level: 3,
-    parentId: 5 // RIGHT child of David Brown
-  },
-  {
-    id: 12,
-    userId: "USR012",
-    name: "Christopher Lee",
-    miningPackage: "Basic",
-    position: "Member",
-    status: "Active",
-    directTeam: 0,
-    totalTeam: 1,
-    directBusiness: "$190",
-    teamBusiness: "$450",
-    rank: "Bronze",
-    joiningDate: "2024-02-25",
-    activationDate: "2024-03-01",
-    level: 3,
-    parentId: 7 // LEFT child of Lisa Anderson
-  },
-  {
-    id: 13,
-    userId: "USR013",
-    name: "Amanda Garcia",
-    miningPackage: "Basic",
-    position: "Member",
-    status: "Active",
-    directTeam: 0,
-    totalTeam: 1,
-    directBusiness: "$170",
-    teamBusiness: "$420",
-    rank: "Bronze",
-    joiningDate: "2024-03-05",
-    activationDate: "2024-03-08",
-    level: 3,
-    parentId: 7 // RIGHT child of Lisa Anderson
-  },
-  {
-    id: 14,
-    userId: "USR014",
-    name: "Daniel Rodriguez",
-    miningPackage: "Standard",
-    position: "Member",
-    status: "Active",
-    directTeam: 0,
-    totalTeam: 1,
-    directBusiness: "$210",
-    teamBusiness: "$480",
-    rank: "Bronze",
-    joiningDate: "2024-03-10",
-    activationDate: "2024-03-15",
-    level: 3,
-    parentId: 8 // LEFT child of Michael Chen
-  },
-  {
-    id: 15,
-    userId: "USR015",
-    name: "Jessica Thompson",
-    miningPackage: "Basic",
-    position: "Member",
-    status: "Inactive",
-    directTeam: 0,
-    totalTeam: 0,
-    directBusiness: "$100",
-    teamBusiness: "$300",
-    rank: "Bronze",
-    joiningDate: "2024-03-12",
-    activationDate: "2024-03-18",
-    level: 3,
-    parentId: 8 // RIGHT child of Michael Chen
-  }
-];
 
 // Helper function to get initials from name
 const getInitials = (name: string): string => {
@@ -290,16 +31,16 @@ const getInitials = (name: string): string => {
 
 // Helper function to get card color based on status and position
 const getCardColor = (status: string, position: string): string => {
-  if (status === "Inactive") return "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800";
-  if (position.toLowerCase().includes("senior")) return "bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800";
-  if (position.toLowerCase().includes("manager")) return "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800";
-  if (position.toLowerCase().includes("lead")) return "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800";
+   if (status === "INACTIVE") return "bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800";
+    if (position.toLowerCase().includes("Left")) return "bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800";
+   if (position.toLowerCase().includes("Right")) return "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800";
+  // if (position.toLowerCase().includes("lead")) return "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800";
   return "bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700";
 };
 
 // Component for rendering a single team member card
 const TeamMemberCard: React.FC<{ member: TeamMember; treePosition?: "left" | "right" | "root" }> = ({ member, treePosition }) => {
-  const initials = getInitials(member.name);
+  const initials = getInitials(member.memberName);
   const cardColor = getCardColor(member.status, member.position);
 
   return (
@@ -330,7 +71,7 @@ const TeamMemberCard: React.FC<{ member: TeamMember; treePosition?: "left" | "ri
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate">
-            {member.name}
+            {member.memberName}
           </h3>
           {/* <div className="mt-1.5">
             <span className="inline-block px-2.5 py-1 text-xs font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-md uppercase tracking-wide">
@@ -338,16 +79,16 @@ const TeamMemberCard: React.FC<{ member: TeamMember; treePosition?: "left" | "ri
             </span>
           </div> */}
           <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
-            {member.userId} | {member.userId.replace("USR", "")}
+            {member.memberId} | {member.memberId.replace("USR", "")}
           </p>
-          <div className="flex items-center space-x-2 mt-2">
+          {/* <div className="flex items-center space-x-2 mt-2">
             <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
               {member.directTeam} Direct
             </span>
             <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
               {member.totalTeam} Total
             </span>
-          </div>
+          </div> */}
           <div className="mt-2 flex items-center space-x-1">
             <span className={`text-xs px-2 py-0.5 rounded-full ${
               member.status === "Active"
@@ -373,17 +114,17 @@ type HierarchicalMember = TeamMember & { children: HierarchicalMember[] };
 const OrgChartModal: React.FC<{ members: TeamMember[]; onClose: () => void }> = ({ members, onClose }) => {
   // Build hierarchy tree
   const buildHierarchy = (members: TeamMember[]): HierarchicalMember[] => {
-    const memberMap = new Map<number, HierarchicalMember>();
+    const memberMap = new Map<string, HierarchicalMember>();
     const rootMembers: HierarchicalMember[] = [];
 
     // Initialize all members with children array
     members.forEach((member) => {
-      memberMap.set(member.id, { ...member, children: [] });
+      memberMap.set(member.memberId, { ...member, children: [] });
     });
 
     // Build tree structure
     members.forEach((member) => {
-      const memberWithChildren = memberMap.get(member.id)!;
+      const memberWithChildren = memberMap.get(member.memberId)!;
       if (member.parentId && memberMap.has(member.parentId)) {
         const parent = memberMap.get(member.parentId)!;
         parent.children.push(memberWithChildren);
@@ -398,7 +139,7 @@ const OrgChartModal: React.FC<{ members: TeamMember[]; onClose: () => void }> = 
   const hierarchy = useMemo(() => buildHierarchy(members), [members]);
 
   // Render a single node in binary tree structure
-  const renderNode = (member: HierarchicalMember, level: number = 0, isRoot: boolean = false, position: "left" | "right" | "root" = "root"): React.ReactNode => {
+  const renderNode = (member: HierarchicalMember, memberLevel: number = 0, isRoot: boolean = false, position: "left" | "right" | "root" = "root"): React.ReactNode => {
     // Limit to 2 children for binary tree
     const leftChild = member.children[0] || null;
     const rightChild = member.children[1] || null;
@@ -440,7 +181,7 @@ const OrgChartModal: React.FC<{ members: TeamMember[]; onClose: () => void }> = 
                   
                   {/* Render left child */}
                   <div className="mt-6">
-                    {renderNode(leftChild, level + 1, false, "left")}
+                    {renderNode(leftChild, memberLevel + 1, false, "left")}
                   </div>
                 </div>
               )}
@@ -457,7 +198,7 @@ const OrgChartModal: React.FC<{ members: TeamMember[]; onClose: () => void }> = 
                   
                   {/* Render right child */}
                   <div className="mt-6">
-                    {renderNode(rightChild, level + 1, false, "right")}
+                    {renderNode(rightChild, memberLevel + 1, false, "right")}
                   </div>
                 </div>
               )}
@@ -512,13 +253,62 @@ export default function DirectTeam() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const { isOpen: showAddModal, openModal: openAddModal, closeModal: closeAddModal } = useModal();
+  const [isLoading, setIsLoading] = useState(true);
+  const [directTeamData, setDirectTeamData] = useState<TeamMember[]>([]);
 
-  const filteredData = sampleData.filter(member =>
-    member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.miningPackage.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    member.rank.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // API call
+const fetchAllTeamData = async () => {
+  const userData = localStorage.getItem("stylocoin_user");
+  const parsed = userData ? JSON.parse(userData) : null;
+
+  const nodeId = parsed?.nodeId || parsed?.userNodeId || parsed?.node_id;
+  console.log("******************",nodeId)
+
+  try {
+    setIsLoading(true);
+
+    const res = await fetch(
+      `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getAllDirectMember?page=0&size=25&filterBy=ACTIVE&inputPkId=${nodeId}&inputFkId=null`
+    );
+
+    const json = await res.json();
+
+    // Your API returns:  { data: [ ... ] }
+    // setTeamData(json?.data || []);
+    let i = 0;
+    const mapped = json.data.map((item: any) => ({
+      id: i++,
+      parentId: item.parentId ,
+      memberId: item.memberId,
+      memberName: item.memberName,
+      memberEmail: item.memberEmail,
+      memberLevel: item.memberLevel,
+      position: item.position,
+      status: item.status,
+      joiningDate: item.joiningDate,
+      activationDate: item.activationDate,
+      rank: item.rank,
+    }));
+
+    setDirectTeamData(mapped);
+
+  } catch (error) {
+    console.error("Error fetching ranks:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchAllTeamData();
+}, []);
+
+const filteredData = directTeamData.filter(member =>
+  member.memberId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  member.memberName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  member.memberEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  member.position.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -595,9 +385,9 @@ export default function DirectTeam() {
                   currentData.map((member, index) => (
                     <tr key={member.id} className="border-b border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{startIndex + index + 1}</td>
-                      <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.userId}</td>
-                      <td className="py-3 px-4 text-gray-900 dark:text-white">{member.name}</td>
-                      <td className="py-3 px-4">
+                      <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.memberId}</td>
+                      <td className="py-3 px-4 text-gray-900 dark:text-white">{member.memberName}</td>
+                      {/* <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           member.miningPackage === 'Premium' 
                             ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
@@ -607,7 +397,7 @@ export default function DirectTeam() {
                         }`}>
                           {member.miningPackage}
                         </span>
-                      </td>
+                      </td> */}
                       <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{member.position}</td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -618,10 +408,10 @@ export default function DirectTeam() {
                           {member.status}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.directTeam}</td>
+                      {/* <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.directTeam}</td>
                       <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.totalTeam}</td>
                       <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.directBusiness}</td>
-                      <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.teamBusiness}</td>
+                      <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.teamBusiness}</td> */}
                       <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.rank}</td>
                       <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{member.joiningDate}</td>
                       <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{member.activationDate}</td>
@@ -697,7 +487,7 @@ export default function DirectTeam() {
 
       {/* Organizational Chart Modal */}
       {showAddModal && (
-        <OrgChartModal members={sampleData} onClose={closeAddModal} />
+        <OrgChartModal members={directTeamData} onClose={closeAddModal} />
       )}
     </div>
   );
