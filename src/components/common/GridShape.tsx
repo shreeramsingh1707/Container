@@ -1,6 +1,4 @@
 import loginImg from "../images/loginImg.jpg";
-//<div className="absolute right-0 top-0 -z-1 w-full max-w-[400px] xl:max-w-[650px]">
-
 export default function GridShape() {
   return (
     <>
