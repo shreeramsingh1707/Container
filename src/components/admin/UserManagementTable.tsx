@@ -1,20 +1,26 @@
 import React, { useState } from "react";
-import { User, WalletData } from "../../services/api";
+import { User, WalletData ,usersApi} from "../../services/api";
+
 
 interface UserManagementTableProps {
   users?: User[];                // optional to avoid undefined crash
   walletData?: WalletData[];     // optional to avoid undefined crash
   loading: boolean;
+  loadUsers: () => void; // <-- NEW
   onTransactionApproval?: (userId: number) => void;
 }
 
 const UserManagementTable: React.FC<UserManagementTableProps> = ({
   users = [],
   walletData = [],
+  loadUsers,
   onTransactionApproval
 }) => {
 
   const [searchTerm, setSearchTerm] = useState("");
+  const [isUserActive,setIsUserActive]=useState(false);
+    
+  const token = localStorage.getItem("token");
 
   // Safe filtering (no crash even if users = undefined)
   const filteredUsers = users.filter((user) => {
@@ -24,6 +30,19 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
       user.nodeId?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
+ 
+  const handleConfirmUser = async (nodeId:string)=>{
+    console.log("Calling API for:", nodeId);
+    
+    try {
+      await usersApi.confirmUser(nodeId);
+      
+      loadUsers(); // reload table data
+    } catch (e) {
+      setIsUserActive(false);
+    }
+
+  }
 
   const getWallet = (userId: number) => {
     return walletData.find((w) => w.userFkId === userId);
@@ -99,10 +118,12 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
 
                   <td className="p-3">
                     <button
-                      onClick={() => onTransactionApproval?.(user.userPkId)}
+                      // onClick={() => onTransactionApproval?.(user.userPkId)}
+                      onClick={() => handleConfirmUser(user.nodeId)}
                       className="px-3 py-1 bg-blue-500 rounded text-white hover:bg-blue-600"
                     >
-                      View Transactions
+                    {user?.userStatus==="ACTIVE" ? "Active" : "Confirm User"}
+
                     </button>
                   </td>
                 </tr>

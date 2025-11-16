@@ -26,6 +26,7 @@ interface User {
   credentialsNonExpired: boolean;
   isDeleted: boolean;
   isGenericFlag: boolean;
+  userStatus:string;
   isConfirmed?: boolean; // User confirmation status for mining access
   imageUrl?: string | null; // User profile image URL (deprecated, use profileImageUrl)
   profileImageUrl?: string | null; // User profile image URL from API
@@ -125,7 +126,7 @@ export default function AdminUsers() {
 
       const walletUrl = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=${page}&size=${size}&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
       const walletResponse = await fetch(walletUrl);
-      const walletDdata = await response.json();
+      const walletDdata = await walletResponse.json();
 
 
       if (walletDdata.status === "SUCCESS" && walletDdata.data?.length > 0) {
@@ -224,6 +225,7 @@ export default function AdminUsers() {
           users={users}
           walletData={walletData}
           loading={isLoading}
+          loadUsers={fetchData}
           onTransactionApproval={handleTransactionApproval}
         />
 

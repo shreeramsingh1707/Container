@@ -385,6 +385,7 @@ export interface User {
   credentialsNonExpired: boolean;
   isDeleted: boolean;
   isGenericFlag: boolean;
+  userStatus:string;
   isConfirmed?: boolean; // User confirmation status for mining access
   imageUrl?: string | null; // User profile image URL (deprecated, use profileImageUrl)
   profileImageUrl?: string | null; // User profile image URL from API

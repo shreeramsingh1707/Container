@@ -48,32 +48,11 @@ export default function AdminDashboard() {
           referralCode: '',
           position: 'Left',
           isUserIsAdmin: false,
+          userStatus:"ACTIVE",
           roles: [{ roleId: 502, name: 'NORMAL_USER' }],
           enabled: true,
           authorities: [{ authority: 'NORMAL_USER' }],
           username: 'john@example.com',
-          accountNonExpired: true,
-          accountNonLocked: true,
-          credentialsNonExpired: true,
-          isDeleted: false,
-          isGenericFlag: false
-        },
-        {
-          userPkId: 2,
-          versionId: 'test-2',
-          nodeId: 'NODE002',
-          name: 'Jane Smith',
-          email: 'jane@example.com',
-          password: '',
-          country: 'Canada',
-          mobile: '0987654321',
-          referralCode: '',
-          position: 'Right',
-          isUserIsAdmin: true,
-          roles: [{ roleId: 501, name: 'ADMIN_USER' }],
-          enabled: true,
-          authorities: [{ authority: 'ADMIN_USER' }],
-          username: 'jane@example.com',
           accountNonExpired: true,
           accountNonLocked: true,
           credentialsNonExpired: true,
@@ -90,15 +69,6 @@ export default function AdminDashboard() {
           totalCredit: 3500,
           totalDebit: 0,
           userFkId: 1
-        },
-        {
-          walletPkId: 2,
-          mineWallet: 2500,
-          nodeWallet: 1500,
-          capitalWallet: 1000,
-          totalCredit: 5000,
-          totalDebit: 500,
-          userFkId: 2
         }
       ]);
     } finally {
