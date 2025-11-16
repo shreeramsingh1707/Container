@@ -79,8 +79,8 @@ export interface RankReward {
 export interface AddRankRewardRequest {
   rankId: null;
   rankName: string;
-  matching: number;
-  reward: number;
+  matching: Number;
+  reward: Number;
   achieved: boolean;
 }
  
