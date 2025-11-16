@@ -58,7 +58,7 @@ export default function ServicePackage() {
     setLoading(true);
     setError("");
     try {
-      const response = await miningPackageApi.getAll(currentPage, rowsPerPage, filterBy, user?.nodeId || null);
+      const response = await miningPackageApi.getAll(currentPage, rowsPerPage,"NODE", filterBy, user?.nodeId || null);
       const mapped: MiningReportRow[] = (response.content || []).map((item: MiningPackageItem, idx: number) => ({
         id: Number(item.miningPackagePkId ?? idx + 1),
         userId: String(item.userNodeCode ?? "-"),

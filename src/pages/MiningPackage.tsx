@@ -58,11 +58,11 @@ export default function MiningPackage() {
     setLoading(true);
     setError("");
     try {
-      const response = await miningPackageApi.getAll(currentPage, rowsPerPage, filterBy, user?.nodeId || null);
+      const response = await miningPackageApi.getAll(currentPage, rowsPerPage,"MINING",filterBy, user?.nodeId || null);
       const mapped: MiningReportRow[] = (response.content || []).map((item: MiningPackageItem, idx: number) => ({
         id: Number(item.miningPackagePkId ?? idx + 1),
         userId: String(item.userNodeCode ?? "-"),
-        name: "MINING",
+        name: "Mining",
         amount: String(item.packageAmount ?? 0),
         mode: "MINING",
         date: (() => {

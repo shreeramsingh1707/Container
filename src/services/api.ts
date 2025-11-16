@@ -511,11 +511,12 @@ export const miningPackageApi = {
   getAll: (
     page: number = 0,
     size: number = 25,
+    mode:string,
     filterBy: string = 'ACTIVE',
     userNodeId?: string | null
   ): Promise<{ content: MiningPackageItem[]; totalElements: number; count?: number }> =>
     apiCall<any>(
-      `/api/individual/getIndividualMiningPackage?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`
+      `/api/individual/getIndividualMiningPackage?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=${mode}&inputFkId=${userNodeId || 'null'}`
     ).then((response) => ({
       content: response.data || [],
       totalElements: response.count || 0,
