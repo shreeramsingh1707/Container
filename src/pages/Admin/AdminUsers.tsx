@@ -26,6 +26,7 @@ interface User {
   credentialsNonExpired: boolean;
   isDeleted: boolean;
   isGenericFlag: boolean;
+  userStatus:string;
   isConfirmed?: boolean; // User confirmation status for mining access
   imageUrl?: string | null; // User profile image URL (deprecated, use profileImageUrl)
   profileImageUrl?: string | null; // User profile image URL from API
@@ -40,7 +41,7 @@ interface User {
   lastModifiedDateTime?: string;
 }
 
- interface WalletData {
+interface WalletData {
   walletPkId: number;
   mineWallet: number;
   nodeWallet: number;
@@ -81,51 +82,64 @@ export default function AdminUsers() {
     try {
       setIsLoading(true);
       const apiStatusFilter =
-      statusFilter === "active"
-        ? "ACTIVE"
-        : statusFilter === "inactive"
-        ? "INACTIVE"
-        : null;
+        statusFilter === "active"
+          ? "ACTIVE"
+          : statusFilter === "inactive"
+            ? "INACTIVE"
+            : null;
       // const [usersResponse, walletResponse] = await Promise.all([
       //   usersApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null),
-        // walletDataApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null)
+      // walletDataApi.getAll(0, 100, apiStatusFilter, user?.nodeId || null)
       // ]);
-      let page=0;
-      let size=100;
-      
+      let page = 0;
+      let size = 100;
+
       const url = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/users/getUser?page=0&size=25&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
       const response = await fetch(url);
       const data = await response.json();
-      
+
       if (data.status === "SUCCESS" && data.data?.length > 0) {
         const userData = data.data;
-        let  filteredUsers = userData;
-          
-      if (roleFilter === 'admin') {
-        filteredUsers = filteredUsers.filter(usr => 
-          usr.roles?.some(role => role.name === 'ADMIN_USER')
-        );
+        let filteredUsers = userData;
+
+        if (roleFilter === 'admin') {
+          filteredUsers = filteredUsers.filter(usr =>
+            usr.roles?.some(role => role.name === 'ADMIN_USER')
+          );
+        }
+        if (statusFilter === 'active') {
+          filteredUsers = filteredUsers.filter(user =>
+            user.activeStateCodeFkId === "ACTIVE"
+          );
+        } else if (statusFilter === 'inactive') {
+          filteredUsers = filteredUsers.filter(user =>
+            user.activeStateCodeFkId === "INACTIVE"
+          );
+        }
+        
+
+        setUsers(filteredUsers);
       }
-      
-      setUsers(filteredUsers);
+      else {
+        setUsers([]); // <- Important
       }
 
-          const walletUrl =`http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=${page}&size=${size}&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
-           const walletResponse = await fetch(walletUrl);
-           const walletDdata = await response.json();
+      const walletUrl = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=${page}&size=${size}&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
+      const walletResponse = await fetch(walletUrl);
+      const walletDdata = await walletResponse.json();
 
-      
-        if (walletDdata.status === "SUCCESS" && walletDdata.data?.length > 0) {
+
+      if (walletDdata.status === "SUCCESS" && walletDdata.data?.length > 0) {
         const userwalletData = walletDdata.data;
-          setWalletData(userwalletData);
+        setWalletData(userwalletData);
       }
-      
-    
-    
+
+
+
     } catch (error) {
       console.error('Error fetching data:', error);
       // Use mock data for development
-     
+
     } finally {
       setIsLoading(false);
     }
@@ -177,7 +191,7 @@ export default function AdminUsers() {
         title={`${getPageTitle()} - Admin`}
         description="Admin user management interface"
       />
-      
+
       <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 bg-gray-900 min-h-screen">
         {/* Breadcrumb */}
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -207,10 +221,11 @@ export default function AdminUsers() {
         </div>
 
         {/* User Management Table */}
-      <UserManagementTable
+        <UserManagementTable
           users={users}
           walletData={walletData}
           loading={isLoading}
+          loadUsers={fetchData}
           onTransactionApproval={handleTransactionApproval}
         />
 

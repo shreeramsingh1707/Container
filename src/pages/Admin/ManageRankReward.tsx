@@ -120,8 +120,8 @@ export default function ManageRankReward() {
         const addData: AddRankRewardRequest = {
           rankId: null,
           rankName: formData.rankName,
-          matching: formData.matching,
-          reward: formData.reward,
+          matching: Number(formData.matching),
+          reward:Number(formData.reward),
           achieved: formData.achieved || false
         };
         await rankRewardApi.add(addData);

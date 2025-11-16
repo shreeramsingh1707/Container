@@ -48,32 +48,11 @@ export default function AdminDashboard() {
           referralCode: '',
           position: 'Left',
           isUserIsAdmin: false,
+          userStatus:"ACTIVE",
           roles: [{ roleId: 502, name: 'NORMAL_USER' }],
           enabled: true,
           authorities: [{ authority: 'NORMAL_USER' }],
           username: 'john@example.com',
-          accountNonExpired: true,
-          accountNonLocked: true,
-          credentialsNonExpired: true,
-          isDeleted: false,
-          isGenericFlag: false
-        },
-        {
-          userPkId: 2,
-          versionId: 'test-2',
-          nodeId: 'NODE002',
-          name: 'Jane Smith',
-          email: 'jane@example.com',
-          password: '',
-          country: 'Canada',
-          mobile: '0987654321',
-          referralCode: '',
-          position: 'Right',
-          isUserIsAdmin: true,
-          roles: [{ roleId: 501, name: 'ADMIN_USER' }],
-          enabled: true,
-          authorities: [{ authority: 'ADMIN_USER' }],
-          username: 'jane@example.com',
           accountNonExpired: true,
           accountNonLocked: true,
           credentialsNonExpired: true,
@@ -90,15 +69,6 @@ export default function AdminDashboard() {
           totalCredit: 3500,
           totalDebit: 0,
           userFkId: 1
-        },
-        {
-          walletPkId: 2,
-          mineWallet: 2500,
-          nodeWallet: 1500,
-          capitalWallet: 1000,
-          totalCredit: 5000,
-          totalDebit: 500,
-          userFkId: 2
         }
       ]);
     } finally {
@@ -305,7 +275,7 @@ export default function AdminDashboard() {
             />
             <MetricCard
               title="Node Wallet"
-              value={dataApi.response.nodewallet || 0.00}
+              value={dataApi?.response?.nodewallet || 0.00}
               icon={
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -317,7 +287,7 @@ export default function AdminDashboard() {
             />
             <MetricCard
               title="Capital Wallet"
-              value={dataApi.response.capitalWallet || 0.00}
+              value={dataApi?.response?.capitalWallet || 0.00}
               icon={
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
