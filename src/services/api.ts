@@ -924,5 +924,5 @@ export interface PaymentResponse {
 export const depositApi = {
   add: (data: DepositRequest): Promise<PaymentResponse> =>
     apiCall<any>('/api/deposit/create', 'POST', data)
-      .then(response => response.data),
+      .then(response => response),
 };

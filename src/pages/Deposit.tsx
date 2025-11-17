@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { depositApi ,DepositRequest} from "../services/api";
-import { useAuth } from "../context/AuthContext";
+// import { useAuth } from "../context/AuthContext";
 
 interface PaymentResponse {
     pay_address: string;
@@ -16,7 +16,7 @@ interface HistoryItem {
     paymentStatus: string;
 }
 
-const { user } = useAuth();
+// const { user } = useAuth();
 
 const Deposit: React.FC = () => {
     const [amount, setAmount] = useState<string>("");
@@ -24,8 +24,9 @@ const Deposit: React.FC = () => {
     const [payment, setPayment] = useState<PaymentResponse | null>(null);
     const [qrCode, setQrCode] = useState<string>("");
     const [success, setSuccess] = useState<boolean>(false);
-
-    const  userNodeId= user?.nodeId || ""; // dynamically change after login
+    const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+    const userNodeId = user?.nodeId;
+    // const  userNodeId=""  // dynamically change after login
 
    const  depositRequest={
           userNodeId:userNodeId,
@@ -50,7 +51,7 @@ const Deposit: React.FC = () => {
 
             // Generate QR
             setQrCode(
-                `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${paymentResponse.pay_address}`
+                `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${paymentResponse?.pay_address}`
             );
 
             pollPaymentStatus(paymentResponse.payment_id);
