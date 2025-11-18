@@ -246,12 +246,12 @@ export default function DepositFund() {
                       onChange={handleInputChange}
                       className="relative z-20 w-full appearance-none rounded-lg border-2 border-gray-600 bg-gray-700 py-4 px-6 text-white outline-none transition-all focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 hover:border-gray-500"
                     >
-                      <option value="USDT BEP20" className="bg-gray-700">USDT BEP20</option>
-                      <option value="USDT TRC20" className="bg-gray-700">USDT TRC20</option>
+                      <option value="USDT BEP20" className="bg-gray-700">USDT BSC</option>
+                      {/* <option value="USDT TRC20" className="bg-gray-700">USDT TRC20</option>
                       <option value="USDT ERC20" className="bg-gray-700">USDT ERC20</option>
                       <option value="BTC" className="bg-gray-700">Bitcoin (BTC)</option>
                       <option value="ETH" className="bg-gray-700">Ethereum (ETH)</option>
-                      <option value="BNB" className="bg-gray-700">Binance Coin (BNB)</option>
+                      <option value="BNB" className="bg-gray-700">Binance Coin (BNB)</option> */}
                     </select>
                     <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
