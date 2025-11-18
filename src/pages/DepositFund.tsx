@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { EyeIcon, EyeCloseIcon } from "../icons";
-import api, { AddDepositFundRequest, walletDataApi, WalletData } from "../services/api";
+import api, { AddDepositFundRequest, walletDataApi, WalletData,depositApi } from "../services/api";
 import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 interface DepositFundData {
   currency: string;
@@ -11,9 +12,15 @@ interface DepositFundData {
   checkMeOut: boolean;
 }
 
+
+interface PaymentResponse {
+  pay_address: string;
+  pay_amount: number;
+  pay_currency: string;
+  payment_id: string;
+}
 export default function DepositFund() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [formData, setFormData] = useState<DepositFundData>({
     currency: "USDT BEP20",
@@ -24,7 +31,58 @@ export default function DepositFund() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  
+
+  const [amount, setAmount] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [payment, setPayment] = useState<PaymentResponse | null>(null);
+  const [qrCode, setQrCode] = useState<string>("");
+  const [success, setSuccess] = useState<boolean>(false);
+  const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+  const userNodeId = user?.nodeId;
+  // const  userNodeId=""  // dynamically change after login
+
+ const  depositRequest={
+        userNodeId:userNodeId,
+        amount : parseFloat(formData.amount),
+ }
+
+  // const createDeposit = async () => {
+  //     if (!amount) return alert("Enter amount");
+  
+
+  //     setLoading(true);
+
+  //     try {
+      
+  //          const paymentResponse = await depositApi.add(depositRequest);
+
+  //          console.log("Payment Address:", paymentResponse.pay_address);
+  //          console.log("Amount to Pay:", paymentResponse.pay_amount);
+
+      
+  //         setPayment(paymentResponse);
+
+  //         // Generate QR
+  //         setQrCode(
+  //             `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${paymentResponse?.pay_address}`
+  //         );
+
+  //         pollPaymentStatus(paymentResponse.payment_id);
+  //     } catch (error) {
+  //         alert("Error creating deposit");
+  //     }
+
+  //     setLoading(false);
+  // };
+
+ 
+  const copyAddress = () => {
+      if (payment) {
+          navigator.clipboard.writeText(payment.pay_address);
+          alert("Address copied to clipboard!");
+      }
+  };
 
   // Fetch wallet data to get userNodeCode
   useEffect(() => {
@@ -52,7 +110,6 @@ export default function DepositFund() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
     setIsLoading(true);
 
     try {
@@ -73,20 +130,40 @@ export default function DepositFund() {
         throw new Error("User node code not found. Please ensure your wallet is set up.");
       }
 
-      const payload: AddDepositFundRequest = {
-        depositPkId: null,
-        currency: formData.currency,
-        amount: parseFloat(formData.amount),
-        transactionPassword: formData.transactionPassword,
-        userNodeCode: userNodeCode,
-      };
+      // const payload: AddDepositFundRequest = {
+      //   depositPkId: null,
+      //   currency: formData.currency,
+      //   amount: parseFloat(formData.amount),
+      //   transactionPassword: formData.transactionPassword,
+      //   userNodeCode: userNodeCode,
+      // };
 
-      const depositResponse = await api.depositFund.add(payload);
+      // const depositResponse = await api.depositFund.add(payload);
+      
+    
+
+   
+      
+           const paymentResponse = await depositApi.add(depositRequest);
+
+           console.log("Payment Address:", paymentResponse.pay_address);
+           console.log("Amount to Pay:", paymentResponse.pay_amount);
+           setLoading(true);
+      
+          setPayment(paymentResponse);
+
+          // Generate QR
+          // setQrCode(
+          //     `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${paymentResponse?.pay_address}`
+          // );
+
+     
+
 
       // Navigate to confirmation page with deposit data
       navigate("/StyloCoin/depositConfirmation", {
         state: {
-          deposit: depositResponse,
+          paymentResponse: paymentResponse,
           amount: parseFloat(formData.amount),
           currency: formData.currency,
         },
