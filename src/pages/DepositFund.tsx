@@ -42,10 +42,7 @@ export default function DepositFund() {
   const userNodeId = user?.nodeId;
   // const  userNodeId=""  // dynamically change after login
 
-  const depositRequest = {
-    userNodeId: userNodeId,
-    amount: parseFloat(formData.amount),
-  }
+ 
 
 
 
@@ -111,9 +108,15 @@ export default function DepositFund() {
       };
 
       const depositResponse = await api.depositFund.add(payload);
-
+      console.log("depositResponse value--->",depositResponse)
       if (depositResponse?.status === "SUCCESS") {
-
+       console.log("priniting value--->",depositResponse?.response?.depositPkId)
+        const depositRequest = {
+          userNodeId: userNodeId,
+          amount: parseFloat(formData.amount),
+          depositPkId:depositResponse?.response?.depositPkId
+        }
+        console.log("priniting value h--->",depositRequest)
         const paymentResponse = await depositApi.add(depositRequest);
 
         console.log("Payment Address:", paymentResponse.pay_address);
