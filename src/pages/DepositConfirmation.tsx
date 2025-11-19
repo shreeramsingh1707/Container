@@ -80,9 +80,30 @@ export default function DepositConfirmation() {
       creationTime: formatDateTime(now),
       expiryTime: formatDateTime(expiry),
     });
+    console.log("Wallet address received:", confirmationData?.walletAddress);
+
   }, [location.state, navigate]);
 
 
+  const getQRValue = () => {
+    const addr = confirmationData?.walletAddress;
+  
+    if (confirmationData?.currency.includes("BSC") || confirmationData?.currency.includes("BEP20")) {
+      return `ethereum:${addr}`; // Trust wallet uses ethereum: for BSC, BEP20 & ERC20
+    }
+  
+    if (confirmationData?.currency.includes("TRC20")) {
+      return `tron:${addr}`;
+    }
+  
+    if (confirmationData?.currency.includes("BTC")) {
+      return `bitcoin:${addr}`;
+    }
+    console.log("QR Value sent:", addr);
+
+    return addr; // fallback
+  };
+  
 
 
   useEffect(() => {
@@ -131,6 +152,8 @@ export default function DepositConfirmation() {
   };
 
   const copyToClipboard = (text: string) => {
+    console.log("Wallet address received:", text);
+
     navigator.clipboard.writeText(text);
     // You could add a toast notification here
   };
@@ -170,7 +193,8 @@ export default function DepositConfirmation() {
           <div className="flex flex-col items-center">
             <div className="bg-white p-4 rounded-lg mb-4">
               <QRCodeSVG
-                value={confirmationData.walletAddress}
+                // value={confirmationData.walletAddress}
+                value={getQRValue()}
                 size={256}
                 level="H"
                 includeMargin={true}
