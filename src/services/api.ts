@@ -304,7 +304,7 @@ export interface WalletTransferRequest {
   transactionId?: null;
   fromUserId: string;
   toUserId: string;
-  fromWallet: "MINE_WALLET" | "CAPITAL_WALLET" | "NODE_WALLET";
+  // fromWallet: "MINE_WALLET" | "CAPITAL_WALLET" | "NODE_WALLET";
   toWallet: "MINE_WALLET" | "CAPITAL_WALLET" | "NODE_WALLET";
   amount: number;
   status?: "IN_PROGRESS" | "SUCCESS" | "FAILED";

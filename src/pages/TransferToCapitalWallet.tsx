@@ -4,7 +4,7 @@ import { walletTransferApi, walletDataApi, WalletData } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 interface TransferData {
-  fromWallet: string;
+  // fromWallet: string;
   toWallet: string;
   transferTo: string;
   amount: string;
@@ -18,7 +18,7 @@ export default function TransferToCapitalWallet() {
   const { user } = useAuth();
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [formData, setFormData] = useState<TransferData>({
-    fromWallet: "",
+    // fromWallet: "",
     toWallet: "",
     transferTo: "",
     amount: "",
@@ -90,9 +90,9 @@ export default function TransferToCapitalWallet() {
 
   // Get available "To Wallet" options (excluding the selected "From Wallet")
   const getAvailableToWallets = () => {
-    if (!formData.fromWallet) return walletTypes;
-    return walletTypes.filter(wallet => wallet.value !== formData.fromWallet);
-  };
+  return walletTypes.filter(wallet => wallet.value === "capitalWallet");
+};
+
 
   const handleSendOTP = async () => {
     setOtpLoading(true);
@@ -116,13 +116,10 @@ export default function TransferToCapitalWallet() {
 
     try {
       // Basic validation
-      if (!formData.fromWallet) {
-        throw new Error("Please select a From Wallet");
-      }
       if (!formData.toWallet) {
         throw new Error("Please select a To Wallet");
       }
-      if (formData.fromWallet === formData.toWallet) {
+      if (formData.toWallet) {
         throw new Error("Cannot transfer to the same wallet type");
       }
       if (!formData.transferTo) {
@@ -148,10 +145,10 @@ export default function TransferToCapitalWallet() {
       }
 
       // Get wallet type enum values
-      const fromWalletType = getWalletTypeEnum(formData.fromWallet);
+      // const fromWalletType = getWalletTypeEnum(formData.fromWallet);
       const toWalletType = getWalletTypeEnum(formData.toWallet);
 
-      if (!fromWalletType || !toWalletType) {
+      if (!toWalletType) {
         throw new Error("Invalid wallet type selected");
       }
 
@@ -161,7 +158,6 @@ export default function TransferToCapitalWallet() {
         transactionId: null,
         fromUserId: fromUserId,
         toUserId: formData.transferTo.trim(),
-        fromWallet: fromWalletType,
         toWallet: toWalletType,
         amount: parseFloat(formData.amount),
         status: "IN_PROGRESS" as const,
@@ -175,7 +171,7 @@ export default function TransferToCapitalWallet() {
       const toWalletLabel = walletTypes.find(w => w.value === formData.toWallet)?.label || "Wallet";
       setSuccess(`Transfer completed successfully! Funds have been transferred to the ${toWalletLabel}.`);
       setFormData({
-        fromWallet: "",
+        // fromWallet: "",
         toWallet: "",
         transferTo: "",
         amount: "",
@@ -280,7 +276,7 @@ export default function TransferToCapitalWallet() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="mb-6">
+                  {/* <div className="mb-6">
                     <label className="mb-3 block text-white font-medium text-lg">
                       From Wallet
                     </label>
@@ -306,22 +302,22 @@ export default function TransferToCapitalWallet() {
                         </svg>
                       </span>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="mb-6">
                     <label className="mb-3 block text-white font-medium text-lg">
-                      To Wallet
+                      Wallet
                     </label>
                     <div className="relative z-20">
                       <select
                         name="toWallet"
                         value={formData.toWallet}
                         onChange={handleInputChange}
-                        disabled={!formData.fromWallet}
+                        disabled={false}
                         className="relative z-20 w-full appearance-none rounded-lg border-2 border-gray-600 bg-gray-700 py-4 px-6 text-white outline-none transition-all focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 hover:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <option value="" className="bg-gray-700">
-                          {formData.fromWallet ? "Select To Wallet--" : "Select From Wallet first--"}
+                          {"Select From Wallet first--"}
                         </option>
                         {getAvailableToWallets().map((wallet) => (
                           <option key={wallet.value} value={wallet.value} className="bg-gray-700">
@@ -337,7 +333,7 @@ export default function TransferToCapitalWallet() {
                         </svg>
                       </span>
                     </div>
-                    {formData.fromWallet && formData.toWallet === formData.fromWallet && (
+                    {formData.toWallet &&(
                       <p className="mt-2 text-sm text-red-400">Cannot transfer to the same wallet type</p>
                     )}
                   </div>

@@ -4,7 +4,7 @@ import { walletTransferApi, walletDataApi, WalletData } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 interface TransferData {
-  fromWallet: string;
+  // fromWallet: string;
   toWallet: string;
   transferTo: string;
   amount: string;
@@ -18,7 +18,7 @@ export default function TransferToNodeWallet() {
   const { user } = useAuth();
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [formData, setFormData] = useState<TransferData>({
-    fromWallet: "",
+    // fromWallet: "",
     toWallet: "",
     transferTo: "",
     amount: "",
@@ -72,7 +72,7 @@ export default function TransferToNodeWallet() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
-    
+
     // If fromWallet changes, reset toWallet to prevent same-type selection
     if (name === "fromWallet") {
       setFormData(prev => ({
@@ -90,9 +90,9 @@ export default function TransferToNodeWallet() {
 
   // Get available "To Wallet" options (excluding the selected "From Wallet")
   const getAvailableToWallets = () => {
-    if (!formData.fromWallet) return walletTypes;
-    return walletTypes.filter(wallet => wallet.value !== formData.fromWallet);
-  };
+  return walletTypes.filter(wallet => wallet.value === "nodeWallet");
+};
+
 
   const handleSendOTP = async () => {
     setOtpLoading(true);
@@ -116,13 +116,10 @@ export default function TransferToNodeWallet() {
 
     try {
       // Basic validation
-      if (!formData.fromWallet) {
-        throw new Error("Please select a From Wallet");
-      }
       if (!formData.toWallet) {
         throw new Error("Please select a To Wallet");
       }
-      if (formData.fromWallet === formData.toWallet) {
+      if (formData.toWallet) {
         throw new Error("Cannot transfer to the same wallet type");
       }
       if (!formData.transferTo) {
@@ -148,10 +145,10 @@ export default function TransferToNodeWallet() {
       }
 
       // Get wallet type enum values
-      const fromWalletType = getWalletTypeEnum(formData.fromWallet);
+      // const fromWalletType = getWalletTypeEnum(formData.fromWallet);
       const toWalletType = getWalletTypeEnum(formData.toWallet);
 
-      if (!fromWalletType || !toWalletType) {
+      if (!toWalletType) {
         throw new Error("Invalid wallet type selected");
       }
 
@@ -161,7 +158,7 @@ export default function TransferToNodeWallet() {
         transactionId: null,
         fromUserId: fromUserId,
         toUserId: formData.transferTo.trim(),
-        fromWallet: fromWalletType,
+        // fromWallet: fromWalletType,
         toWallet: toWalletType,
         amount: parseFloat(formData.amount),
         status: "IN_PROGRESS" as const,
@@ -175,7 +172,7 @@ export default function TransferToNodeWallet() {
       const toWalletLabel = walletTypes.find(w => w.value === formData.toWallet)?.label || "Wallet";
       setSuccess(`Transfer completed successfully! Funds have been transferred to the ${toWalletLabel}.`);
       setFormData({
-        fromWallet: "",
+        // fromWallet: "",
         toWallet: "",
         transferTo: "",
         amount: "",
@@ -280,8 +277,8 @@ export default function TransferToNodeWallet() {
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="mb-6">
-                    <label className="mb-3 block text-white font-medium text-lg">
+                  {/* <div className="mb-6"> */}
+                    {/* <label className="mb-3 block text-white font-medium text-lg">
                       From Wallet
                     </label>
                     <div className="relative z-20">
@@ -301,12 +298,12 @@ export default function TransferToNodeWallet() {
                       <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <g opacity="0.8">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF" />
                           </g>
                         </svg>
                       </span>
-                    </div>
-                  </div>
+                    </div> */}
+                  {/* </div> */}
 
                   <div className="mb-6">
                     <label className="mb-3 block text-white font-medium text-lg">
@@ -317,11 +314,11 @@ export default function TransferToNodeWallet() {
                         name="toWallet"
                         value={formData.toWallet}
                         onChange={handleInputChange}
-                        disabled={!formData.fromWallet}
+                        disabled={false}
                         className="relative z-20 w-full appearance-none rounded-lg border-2 border-gray-600 bg-gray-700 py-4 px-6 text-white outline-none transition-all focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 hover:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <option value="" className="bg-gray-700">
-                          {formData.fromWallet ? "Select To Wallet--" : "Select From Wallet first--"}
+                          {"Select From Wallet first--"}
                         </option>
                         {getAvailableToWallets().map((wallet) => (
                           <option key={wallet.value} value={wallet.value} className="bg-gray-700">
@@ -332,12 +329,12 @@ export default function TransferToNodeWallet() {
                       <span className="absolute top-1/2 right-4 z-10 -translate-y-1/2">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                           <g opacity="0.8">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M5.29289 8.29289C5.68342 7.90237 6.31658 7.90237 6.70711 8.29289L12 13.5858L17.2929 8.29289C17.6834 7.90237 18.3166 7.90237 18.7071 8.29289C19.0976 8.68342 19.0976 9.31658 18.7071 9.70711L12.7071 15.7071C12.3166 16.0976 11.6834 16.0976 11.2929 15.7071L5.29289 9.70711C4.90237 9.31658 4.90237 8.68342 5.29289 8.29289Z" fill="#9CA3AF" />
                           </g>
                         </svg>
                       </span>
                     </div>
-                    {formData.fromWallet && formData.toWallet === formData.fromWallet && (
+                    {formData.toWallet && (
                       <p className="mt-2 text-sm text-red-400">Cannot transfer to the same wallet type</p>
                     )}
                   </div>
@@ -358,8 +355,8 @@ export default function TransferToNodeWallet() {
                     />
                     <span className="absolute left-4 top-1/2 -translate-y-1/2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <circle cx="12" cy="7" r="4" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="12" cy="7" r="4" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </span>
                   </div>
@@ -380,9 +377,9 @@ export default function TransferToNodeWallet() {
                     />
                     <span className="absolute left-4 top-1/2 -translate-y-1/2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M2 17L12 22L22 17" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M2 12L12 17L22 12" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M2 17L12 22L22 17" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M2 12L12 17L22 12" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </span>
                   </div>
@@ -403,8 +400,8 @@ export default function TransferToNodeWallet() {
                     />
                     <span className="absolute left-4 top-1/2 -translate-y-1/2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 22S2 16 2 9A10 10 0 0 1 12 2A10 10 0 0 1 22 9C22 16 12 22 12 22Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                        <circle cx="12" cy="9" r="3" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 22S2 16 2 9A10 10 0 0 1 12 2A10 10 0 0 1 22 9C22 16 12 22 12 22Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="12" cy="9" r="3" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </span>
                     <button
@@ -437,8 +434,8 @@ export default function TransferToNodeWallet() {
                       />
                       <span className="absolute left-4 top-1/2 -translate-y-1/2">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 22S2 16 2 9A10 10 0 0 1 12 2A10 10 0 0 1 22 9C22 16 12 22 12 22Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          <circle cx="12" cy="9" r="3" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M12 22S2 16 2 9A10 10 0 0 1 12 2A10 10 0 0 1 22 9C22 16 12 22 12 22Z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                          <circle cx="12" cy="9" r="3" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                       </span>
                     </div>
@@ -486,14 +483,13 @@ export default function TransferToNodeWallet() {
                         onChange={handleInputChange}
                         className="sr-only"
                       />
-                      <div className={`box mr-4 flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-all ${
-                        formData.checkMeOut 
-                          ? "border-orange-500 bg-orange-500 shadow-lg shadow-orange-500/25" 
+                      <div className={`box mr-4 flex h-6 w-6 items-center justify-center rounded-lg border-2 transition-all ${formData.checkMeOut
+                          ? "border-orange-500 bg-orange-500 shadow-lg shadow-orange-500/25"
                           : "border-gray-600 bg-gray-700 group-hover:border-gray-500"
-                      }`}>
+                        }`}>
                         <span className={`text-white transition-opacity ${formData.checkMeOut ? "opacity-100" : "opacity-0"}`}>
                           <svg width="12" height="9" viewBox="0 0 12 9" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path fillRule="evenodd" clipRule="evenodd" d="M11.7071 0.292893C12.0976 0.683417 12.0976 1.31658 11.7071 1.70711L5.41421 8C4.63316 8.78095 3.36684 8.78095 2.58579 8L0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289C0.683417 3.90237 1.31658 3.90237 1.70711 4.29289L4 6.58579L10.2929 0.292893C10.6834 -0.0976311 11.3166 -0.0976311 11.7071 0.292893Z" fill="currentColor"/>
+                            <path fillRule="evenodd" clipRule="evenodd" d="M11.7071 0.292893C12.0976 0.683417 12.0976 1.31658 11.7071 1.70711L5.41421 8C4.63316 8.78095 3.36684 8.78095 2.58579 8L0.292893 5.70711C-0.0976311 5.31658 -0.0976311 4.68342 0.292893 4.29289C0.683417 3.90237 1.31658 3.90237 1.70711 4.29289L4 6.58579L10.2929 0.292893C10.6834 -0.0976311 11.3166 -0.0976311 11.7071 0.292893Z" fill="currentColor" />
                           </svg>
                         </span>
                       </div>
