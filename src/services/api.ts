@@ -638,6 +638,7 @@ export interface DepositFundItem {
   recordStateCodeFkId?: string;
   createdDatetime?: string;
   lastModifiedDateTime?: string;
+  response?:DepositFundItem
 }
  
 export interface AddDepositFundRequest {

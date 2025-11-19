@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { QRCodeSVG } from "qrcode.react";
-import { DepositFundItem } from "../services/api";
+import { PaymentResponse } from "../services/api";
+import axios from "axios";
+
+const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+const userNodeId = user?.nodeId;
 
 interface DepositConfirmationData {
-  deposit: DepositFundItem;
+  paymentResponse: PaymentResponse;
   amount: number;
   currency: string;
   paymentId: string;
@@ -13,62 +17,105 @@ interface DepositConfirmationData {
   expiryTime: string;
 }
 
+interface HistoryItem {
+  paymentId: string;
+  paymentStatus: string;
+}
+
 export default function DepositConfirmation() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [success, setSuccess] = useState<boolean>(false);
+  const [paymentIdValue,setPaymentIdValue]=useState("");
   const [confirmationData, setConfirmationData] = useState<DepositConfirmationData | null>(null);
+
+  const pollPaymentStatus = async (paymentId: string) => {
+    console.log("paymentId is setting",paymentId)
+    try {
+      const res = await axios.get(
+        `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/deposit/history/${userNodeId}`
+      );
+  
+      const list: HistoryItem[] = res.data.data;
+  
+      const record = list.find((x) => x.paymentId === paymentId);
+  
+      if (record && record.paymentStatus === "SUCCESS") {
+        setSuccess(true);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  
 
   useEffect(() => {
     // Get deposit data from navigation state
-    const state = location.state as { deposit?: DepositFundItem; amount?: number; currency?: string } | null;
+    const state = location.state as { paymentResponse?: PaymentResponse; amount?: number; currency?: string,paymentIdValueForPoll?:string } | null;
     
-    if (!state?.deposit) {
+    if (!state?.paymentResponse) {
       // If no deposit data, redirect back to deposit page
       navigate("/StyloCoin/depositFund");
       return;
     }
 
     // Generate payment ID (using depositPkId or a random string)
-    const paymentId = state.deposit.depositPkId 
-      ? `DEP${state.deposit.depositPkId.toString().padStart(10, '0')}`
-      : generatePaymentId();
+    // const paymentId = state.paymentResponse. 
+    //   ? `DEP${state.deposit.depositPkId.toString().padStart(10, '0')}`
+    //   : generatePaymentId();
 
     // Generate wallet address (in real app, this would come from API)
-    const walletAddress = generateWalletAddress(state.currency || "USDT.BEP20");
+    // const walletAddress = generateWalletAddress(state.currency || "USDT.BEP20");
 
     // Calculate times
     const now = new Date();
     const expiry = new Date(now.getTime() + 3 * 60 * 60 * 1000); // 3 hours from now
-
+    setPaymentIdValue(state.paymentIdValueForPoll ||state.paymentResponse.payment_id)
     setConfirmationData({
-      deposit: state.deposit,
-      amount: state.amount || state.deposit.amount || 0,
-      currency: state.currency || state.deposit.currency || "USDT.BEP20",
-      paymentId,
-      walletAddress,
+      paymentResponse: state.paymentResponse,
+      amount: state.amount || state.paymentResponse?.pay_amount || 0,
+      currency: state.currency || state.paymentResponse.pay_currency || "USDT.BSC",
+      paymentId:state.paymentResponse.payment_id,
+      walletAddress:state.paymentResponse.pay_address,
       creationTime: formatDateTime(now),
       expiryTime: formatDateTime(expiry),
     });
   }, [location.state, navigate]);
 
-  const generatePaymentId = (): string => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    let result = "";
-    for (let i = 0; i < 26; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
-  };
 
-  const generateWalletAddress = (currency: string): string => {
-    // In a real app, this would come from the API
-    // For now, generate a placeholder address
-    const prefix = currency.includes("BTC") ? "1" : currency.includes("ETH") || currency.includes("USDT") ? "0x" : "";
-    const randomHex = Array.from({ length: 40 }, () => 
-      Math.floor(Math.random() * 16).toString(16)
-    ).join("");
-    return `${prefix}${randomHex}`;
-  };
+
+
+  useEffect(() => {
+    if (!paymentIdValue) return; // Wait until value is set
+  
+    console.log("Starting polling for:", paymentIdValue);
+  
+    const interval = setInterval(() => {
+      pollPaymentStatus(paymentIdValue);
+    }, 4000);
+  
+    return () => clearInterval(interval); // Proper cleanup
+  }, [paymentIdValue]);
+  
+
+  // const generatePaymentId = (): string => {
+  //   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  //   let result = "";
+  //   for (let i = 0; i < 26; i++) {
+  //     result += chars.charAt(Math.floor(Math.random() * chars.length));
+  //   }
+  //   return result;
+  // };
+
+  // const generateWalletAddress = (currency: string): string => {
+  //   // In a real app, this would come from the API
+  //   // For now, generate a placeholder address
+  //   const prefix = currency.includes("BTC") ? "1" : currency.includes("ETH") || currency.includes("USDT") ? "0x" : "";
+  //   const randomHex = Array.from({ length: 40 }, () => 
+  //     Math.floor(Math.random() * 16).toString(16)
+  //   ).join("");
+  //   return `${prefix}${randomHex}`;
+  // };
 
   const formatDateTime = (date: Date): string => {
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -200,7 +247,27 @@ export default function DepositConfirmation() {
       <div className="mt-8 text-center">
         <p className="text-gray-500 text-sm">2025 © Mine Cryptos. All Right Reserved</p>
       </div>
+       {/* Step 3: Success */}
+       {success && (
+                <div style={styles.successBox}>
+                    <h3>🎉 Deposit Successful!</h3>
+                    <p>Your wallet has been credited.</p>
+                </div>
+            )}
     </div>
   );
 }
 
+
+// ====================
+// Inline Styles
+// ====================
+const styles: { [key: string]: React.CSSProperties } = {
+  successBox: {
+      background: "#d4ffd4",
+      padding: "20px",
+      borderRadius: "10px",
+      textAlign: "center",
+      marginTop: "20px",
+  },
+};

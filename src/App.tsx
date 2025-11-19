@@ -96,8 +96,8 @@ export default function App() {
             <Route path="miningProfitSharing" element={<MiningProfitSharing />} />
             <Route path="miningGeneration" element={<MiningGenerationIncome />} />
             <Route path="nodeBusinessSharing" element={<NodeBusinessSharing />} />
-            {/* <Route path="depositFund" element={<DepositFund />} /> */}
-            <Route path="depositFund" element={<Deposit />} />
+            <Route path="depositFund" element={<DepositFund />} />
+            {/* <Route path="depositFund" element={<Deposit />} /> */}
             <Route path="depositConfirmation" element={<DepositConfirmation />} />
             <Route path="depositInvoice" element={<DepositInvoice />} />
             <Route path="rankAndReward" element={<RankAndReward />} />
