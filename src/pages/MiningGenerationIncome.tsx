@@ -1,108 +1,6 @@
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { EyeIcon } from "../icons";
-
-interface MiningGenerationRecord {
-  id: number;
-  userId: string;
-  name: string;
-  income: string;
-  percentage: string;
-  level: string;
-  date: string;
-}
-
-const sampleData: MiningGenerationRecord[] = [
-  {
-    id: 1,
-    userId: "USR001",
-    name: "John Smith",
-    income: "$1,250.00",
-    percentage: "2.5%",
-    level: "Gold",
-    date: "2024-01-15"
-  },
-  {
-    id: 2,
-    userId: "USR002",
-    name: "Sarah Johnson",
-    income: "$850.50",
-    percentage: "1.8%",
-    level: "Silver",
-    date: "2024-01-14"
-  },
-  {
-    id: 3,
-    userId: "USR003",
-    name: "Mike Davis",
-    income: "$2,100.75",
-    percentage: "3.2%",
-    level: "Platinum",
-    date: "2024-01-13"
-  },
-  {
-    id: 4,
-    userId: "USR004",
-    name: "Emily Wilson",
-    income: "$650.25",
-    percentage: "1.5%",
-    level: "Bronze",
-    date: "2024-01-12"
-  },
-  {
-    id: 5,
-    userId: "USR005",
-    name: "David Brown",
-    income: "$1,800.00",
-    percentage: "2.8%",
-    level: "Gold",
-    date: "2024-01-11"
-  },
-  {
-    id: 6,
-    userId: "USR006",
-    name: "Lisa Anderson",
-    income: "$3,500.00",
-    percentage: "4.5%",
-    level: "Diamond",
-    date: "2024-01-10"
-  },
-  {
-    id: 7,
-    userId: "USR007",
-    name: "Robert Taylor",
-    income: "$950.50",
-    percentage: "2.0%",
-    level: "Silver",
-    date: "2024-01-09"
-  },
-  {
-    id: 8,
-    userId: "USR008",
-    name: "Jennifer Martinez",
-    income: "$1,400.75",
-    percentage: "2.3%",
-    level: "Gold",
-    date: "2024-01-08"
-  },
-  {
-    id: 9,
-    userId: "USR009",
-    name: "Michael Garcia",
-    income: "$2,750.00",
-    percentage: "3.8%",
-    level: "Platinum",
-    date: "2024-01-07"
-  },
-  {
-    id: 10,
-    userId: "USR010",
-    name: "Amanda White",
-    income: "$1,100.25",
-    percentage: "1.9%",
-    level: "Silver",
-    date: "2024-01-06"
-  }
-];
+import {incomeStreamsApi,IncomeStreams} from "../services/api"
 
 export default function MiningGenerationIncome() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -110,13 +8,47 @@ export default function MiningGenerationIncome() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [startDate, setStartDate] = useState("07/10/2025");
   const [endDate, setEndDate] = useState("07/10/2025");
+  const [incomeData, setIncomeData] = useState<IncomeStreams[]>([]);
+  const [loading,setLoading]=useState(false);
 
-  const filteredData = sampleData.filter(record =>
-    record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.level.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.income.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.percentage.toLowerCase().includes(searchTerm.toLowerCase())
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+      const nodeId = user?.nodeId;
+
+      if (!nodeId) {
+        console.warn("No nodeId found in localStorage");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        //  WAIT for API response
+        const response = await incomeStreamsApi.getAll(0, 25, 'ACTIVE', nodeId);
+
+        console.log("Income Streams Real Response:", response);
+
+        if (response.content && response.content.length > 0) {
+          setIncomeData(response.content);
+        } else {
+          console.warn("Income streams empty");
+        }
+
+      } catch (err) {
+        console.error("Income API error:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const filteredData = incomeData.filter(record =>
+    record.userName.toLowerCase().includes(searchTerm.toLowerCase()) 
+    // record.userNodeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    // record.level.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    // record.income.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    // record.percentage.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -130,9 +62,10 @@ export default function MiningGenerationIncome() {
   };
 
   // Calculate total mining generation income
-  const totalMiningIncome = sampleData.reduce((sum, record) => {
-    return sum + parseFloat(record.income.replace('$', '').replace(',', ''));
-  }, 0);
+  const totalMiningIncome =   filteredData.reduce(
+    (sum, record) => sum + (record?.matchingIncomeAmount || 0),
+    0
+  ) ;
 
   return (
     <div className="p-6">
