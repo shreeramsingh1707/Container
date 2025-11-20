@@ -211,14 +211,14 @@ export default function Home() {
 
             {/* Income Metrics Grid */}
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-  <DashboardMetricCard
-    title="Service Generation Income"
-    amount={incomeData?.[0]?.serviceGenerationAmount ?? 0}
-  />
-</div>
+              <DashboardMetricCard
+                title="Service Generation Income"
+                amount={(incomeData?.[0]?.serviceGenerationAmount ?? 0).toString()}
+              />
+            </div>
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <DashboardMetricCard title="Matching Income" amount={(incomeData?.[0]?.serviceGenerationAmount ?? 0).toString()}
- />
+              />
             </div>
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <DashboardMetricCard title="Club Income" amount={(incomeData?.[0]?.clubIncomeAmount ?? 0).toString()} />
