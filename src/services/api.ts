@@ -357,10 +357,12 @@ export const walletTransactionApi = {
     page: number = 0,
     size: number = 25,
     filterBy: string = 'ACTIVE',
+    inputPkId:string |null,
+    inputFkId:string |null,
     userNodeId?: string | null
   ): Promise<{ content: WalletTransaction[]; totalElements: number; count?: number }> =>
     apiCall<any>(
-      `/api/individual/getWalletTransaction?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`
+      `/api/individual/getWalletTransaction?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=${inputPkId}&inputFkId=${inputFkId}`
  
  
       // `/api/admin/getWalletTransaction?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`

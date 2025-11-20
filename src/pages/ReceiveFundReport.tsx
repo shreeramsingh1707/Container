@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState ,useEffect} from "react";
+import {walletTransactionApi,WalletTransaction}from "../services/api";
+
 
 interface ReceiveRecord {
   id: number;
@@ -16,111 +18,63 @@ export default function ReceiveFundReport() {
   const [searchTerm, setSearchTerm] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [transactions, setTransactions] = useState<WalletTransaction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Mock data for receive fund report
-  const [receiveRecords] = useState<ReceiveRecord[]>([
-    {
-      id: 1,
-      userId: "USER001",
-      name: "John Doe",
-      transferAmount: 1500.00,
-      receiveAmount: 1500.00,
-      particular: "Received from Node Wallet",
-      date: "2025-10-13"
-    },
-    {
-      id: 2,
-      userId: "USER002",
-      name: "Jane Smith",
-      transferAmount: 2500.00,
-      receiveAmount: 2500.00,
-      particular: "Received from Capital Wallet",
-      date: "2025-10-12"
-    },
-    {
-      id: 3,
-      userId: "USER003",
-      name: "Mike Johnson",
-      transferAmount: 750.00,
-      receiveAmount: 750.00,
-      particular: "Package Wallet Receive",
-      date: "2025-10-11"
-    },
-    {
-      id: 4,
-      userId: "USER004",
-      name: "Sarah Wilson",
-      transferAmount: 3200.00,
-      receiveAmount: 3200.00,
-      particular: "Mining Wallet Receive",
-      date: "2025-10-10"
-    },
-    {
-      id: 5,
-      userId: "USER005",
-      name: "David Brown",
-      transferAmount: 1800.00,
-      receiveAmount: 1800.00,
-      particular: "Service Wallet Receive",
-      date: "2025-10-09"
-    },
-    {
-      id: 6,
-      userId: "USER006",
-      name: "Lisa Davis",
-      transferAmount: 950.00,
-      receiveAmount: 950.00,
-      particular: "Bonus Wallet Receive",
-      date: "2025-10-08"
-    },
-    {
-      id: 7,
-      userId: "USER007",
-      name: "Robert Miller",
-      transferAmount: 4200.00,
-      receiveAmount: 4200.00,
-      particular: "Premium Receive",
-      date: "2025-10-07"
-    },
-    {
-      id: 8,
-      userId: "USER008",
-      name: "Emily Garcia",
-      transferAmount: 1650.00,
-      receiveAmount: 1650.00,
-      particular: "Standard Receive",
-      date: "2025-10-06"
-    },
-    {
-      id: 9,
-      userId: "USER009",
-      name: "Chris Martinez",
-      transferAmount: 2100.00,
-      receiveAmount: 2100.00,
-      particular: "Direct Transfer Receive",
-      date: "2025-10-05"
-    },
-    {
-      id: 10,
-      userId: "USER010",
-      name: "Amanda Rodriguez",
-      transferAmount: 1350.00,
-      receiveAmount: 1350.00,
-      particular: "Team Bonus Receive",
-      date: "2025-10-04"
+
+  const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+  const userNodeId = user?.nodeId;
+  // const  userNodeId=""  // dynamically change after login
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      setError('');
+       
+
+      // Fetch transactions
+      try {
+        const transactionsResponse = await walletTransactionApi.getAll(0, 100, 'ACTIVE', null,userNodeId, user?.nodeId || null);
+        setTransactions(transactionsResponse.content || []);
+      } catch (transactionError) {
+        const errorMessage = transactionError instanceof Error ? transactionError.message : 'Failed to load wallet transactions';
+        // If it's a 404, show a more helpful message
+        if (errorMessage.includes('404') || errorMessage.includes('Not Found')) {
+          setError('Wallet transactions API endpoint not found. Please ensure the backend endpoint /api/admin/getWalletTransaction is configured.');
+        } else {
+          setError(errorMessage);
+        }
+        console.error('Error fetching transactions:', transactionError);
+        setTransactions([]);
+      }
+    } catch (e) {
+      const errorMessage = e instanceof Error ? e.message : 'Failed to load data';
+      setError(errorMessage);
+      console.error('Error fetching data:', e);
+      setTransactions([]);
+    
+    } finally {
+      setIsLoading(false);
     }
-  ]);
+  };
 
   // Filter records based on search term
-  const filteredRecords = receiveRecords.filter(record =>
-    record.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.particular.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRecords = transactions.filter(record =>
+    // record.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    record?.userName.toLowerCase().includes(searchTerm.toLowerCase()) 
+    // record.particular.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Calculate total amount
-  const totalAmount = filteredRecords.reduce((sum, record) => sum + record.receiveAmount, 0);
-
+  const totalAmount = filteredRecords.reduce(
+    (sum, record) => sum + (record?.amount || 0),
+    0
+  ) ;
   // Pagination
   const totalPages = Math.ceil(filteredRecords.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
@@ -232,8 +186,8 @@ export default function ReceiveFundReport() {
               <tr>
                 <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">#</th>
                 <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">User Id</th>
-                <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Name</th>
-                <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Transfer Amount</th>
+                <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">User Name</th>
+                {/* <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Transfer Amount</th> */}
                 <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Receive Amount</th>
                 <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Particular</th>
                 <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Date</th>
@@ -244,12 +198,11 @@ export default function ReceiveFundReport() {
                 currentRecords.map((record, index) => (
                   <tr key={record.id} className="hover:bg-gray-700/50 transition-colors">
                     <td className="py-4 px-6 text-white font-medium">{startIndex + index + 1}</td>
-                    <td className="py-4 px-6 text-gray-300">{record.userId}</td>
-                    <td className="py-4 px-6 text-white font-medium">{record.name}</td>
-                    <td className="py-4 px-6 text-white font-semibold">${record.transferAmount.toLocaleString()}</td>
-                    <td className="py-4 px-6 text-green-400 font-semibold">${record.receiveAmount.toLocaleString()}</td>
-                    <td className="py-4 px-6 text-gray-300">{record.particular}</td>
-                    <td className="py-4 px-6 text-gray-300">{formatDate(record.date)}</td>
+                    <td className="py-4 px-6 text-gray-300">{record.fromUserId}</td>
+                    <td className="py-4 px-6 text-white font-medium">{record.userName}</td>
+                    <td className="py-4 px-6 text-white font-semibold">${record.amount}</td>
+                    <td className="py-4 px-6 text-gray-300">{record.remarks}</td>
+                    <td className="py-4 px-6 text-gray-300">{formatDate(record.createdDatetime)}</td>
                   </tr>
                 ))
               ) : (

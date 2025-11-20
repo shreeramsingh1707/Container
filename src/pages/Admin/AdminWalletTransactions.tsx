@@ -43,7 +43,7 @@ export default function AdminWalletTransactions() {
 
       // Fetch transactions
       try {
-        const transactionsResponse = await walletTransactionApi.getAll(0, 100, 'ACTIVE', user?.nodeId || null);
+        const transactionsResponse = await walletTransactionApi.getAll(0, 100, 'ACTIVE',null,null, user?.nodeId || null);
         setTransactions(transactionsResponse.content || []);
       } catch (transactionError) {
         const errorMessage = transactionError instanceof Error ? transactionError.message : 'Failed to load wallet transactions';
