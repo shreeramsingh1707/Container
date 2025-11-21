@@ -486,8 +486,8 @@ console.log("Checking data ----->" ,teamData)
                         </span>
                       </td>
                       <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.rank}</td>
-                      {/* <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{member.joiningDate}</td>
-                      <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{member.activationDate}</td> */}
+                      <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{new Date(member.joiningDate).toISOString().split('T')[0]}</td>
+                      <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{new Date(member.joiningDate).toISOString().split('T')[0]}</td>
                     </tr>
                   ))
                 ) : (

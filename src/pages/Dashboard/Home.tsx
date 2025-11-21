@@ -23,39 +23,7 @@ export default function Home() {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [incomeData, setIncomeData] = useState<IncomeStreams[]>([]);
-  console.log("Income Data: jjh", incomeData[0]);
-
-  // useEffect(() => {
-
-  //   const fetchWalletData = async () => {
-  //     try {
-  //       const response = await fetch(
-  //         "http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=0&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=NODE24212301%22
-  //       );
-
-  //       const data = await response.json();
-
-  //       if (data.status === "SUCCESS" && data.data?.length > 0) {
-  //         const walletInfo = data.data[0];
-  //         setWallet({
-  //           mineWallet: walletInfo.mineWallet ?? 0,
-  //           nodeWallet: walletInfo.nodeWallet ?? 0,
-  //           capitalWallet: walletInfo.capitalWallet ?? 0,
-  //           totalCredit: walletInfo.totalCredit ?? 0,
-  //           totalDebit: walletInfo.totalDebit ?? 0,
-  //         });
-  //       } else {
-  //         console.warn("No wallet data found");
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching wallet data:", error);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   fetchWalletData();
-  // }, []);
+  console.log("Income Data: jjh", wallet);
   //hello world
   useEffect(() => {
     const fetchData = async () => {
@@ -192,7 +160,7 @@ export default function Home() {
                 amount={
                   loading
                     ? "Loading..."
-                    : `${wallet?.totalCredit.toFixed(2)} / ${wallet.totalDebit.toFixed(2)}`
+                    : (wallet.capitalWallet + wallet.nodeWallet).toFixed(2)
                 }
                 colorClass="bg-gradient-to-br from-purple-500 to-pink-600"
                 isWallet={true}
@@ -214,31 +182,46 @@ export default function Home() {
               <DashboardMetricCard
                 title="Service Generation Income"
                 amount={(incomeData?.[0]?.serviceGenerationAmount ?? 0).toString()}
+                viewAllLink="/StyloCoin/serviceGeneration"
               />
             </div>
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <DashboardMetricCard title="Matching Income" amount={(incomeData?.[0]?.serviceGenerationAmount ?? 0).toString()}
+                viewAllLink="/StyloCoin/matchingIncome"
               />
             </div>
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-              <DashboardMetricCard title="Club Income" amount={(incomeData?.[0]?.clubIncomeAmount ?? 0).toString()} />
+              <DashboardMetricCard title="Club Income" amount={(incomeData?.[0]?.clubIncomeAmount ?? 0).toString()}
+                viewAllLink="/StyloCoin/clubIncome"
+              />
+
             </div>
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-              <DashboardMetricCard title="Reward Income" amount={(incomeData?.[0]?.rewardIncomeAmount ?? 0).toString()} />
+              <DashboardMetricCard title="Reward Income" amount={(incomeData?.[0]?.rewardIncomeAmount ?? 0).toString()}
+                viewAllLink="/StyloCoin/rewardIncome"
+              />
             </div>
 
             {/* Additional Income Metrics */}
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-              <DashboardMetricCard title="Fast Track Bonus" amount={(incomeData?.[0]?.fastTrackBonusAmount ?? 0).toString()} />
+              <DashboardMetricCard title="Fast Track Bonus" amount={(incomeData?.[0]?.fastTrackBonusAmount ?? 0).toString()}
+                viewAllLink="/StyloCoin/fastTrackBonus"
+              />
             </div>
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-              <DashboardMetricCard title="Mining Profit Sharing" amount={(incomeData?.[0]?.miningProfitSharingAmount ?? 0).toString()} />
+              <DashboardMetricCard title="Mining Profit Sharing" amount={(incomeData?.[0]?.miningProfitSharingAmount ?? 0).toString()}
+                viewAllLink="/StyloCoin/miningProfitSharing"
+              />
             </div>
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-              <DashboardMetricCard title="Mining Generation Income" amount={(incomeData?.[0]?.miningGenerationIncomeAmount ?? 0).toString()} />
+              <DashboardMetricCard title="Mining Generation Income" amount={(incomeData?.[0]?.miningGenerationIncomeAmount ?? 0).toString()}
+                viewAllLink="/StyloCoin/miningGeneration"
+              />
             </div>
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-              <DashboardMetricCard title="Node Business Sharing" amount={(incomeData?.[0]?.nodeBusinessSharingAmount ?? 0).toString()} />
+              <DashboardMetricCard title="Node Business Sharing" amount={(incomeData?.[0]?.nodeBusinessSharingAmount ?? 0).toString()}
+                viewAllLink="/StyloCoin/nodeBusinessSharing"
+              />
             </div>
 
             {/* Account & Business Details */}

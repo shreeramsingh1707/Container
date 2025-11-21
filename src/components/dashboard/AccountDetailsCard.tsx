@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
  
 interface UserData {
   nodeId: string;
+  parentNodeId: string;
   name: string;
   email: string;
   country: string;
@@ -77,7 +78,7 @@ const AccountDetailsCard: React.FC = () => {
  
   const initials = getInitials(userData.name);
   const accountData = [
-    { label: "Affiliate ID", value: userData.nodeId || "N/A" },
+    { label: "Affiliate ID", value: userData.parentNodeId || "N/A" },
     { label: "Service", value: userData.userStatus || "Inactive" },
     { label: "Country", value: userData.country || "N/A" },
     { label: "Position", value: userData.position || "N/A" },

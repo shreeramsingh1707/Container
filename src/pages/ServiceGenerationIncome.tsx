@@ -1,5 +1,4 @@
 import { useState ,useEffect} from "react";
-import { EyeIcon } from "../icons";
 import {incomeStreamsApi,IncomeStreams} from "../services/api"
 
 interface ServiceIncomeRecord {
@@ -10,50 +9,6 @@ interface ServiceIncomeRecord {
   level: string;
   date: string;
 }
-
-// const sampleData: ServiceIncomeRecord[] = [
-//   {
-//     id: 1,
-//     userId: "USR001",
-//     name: "John Smith",
-//     income: "$1,250.00",
-//     level: "Gold",
-//     date: "2024-01-15"
-//   },
-//   {
-//     id: 2,
-//     userId: "USR002",
-//     name: "Sarah Johnson",
-//     income: "$850.50",
-//     level: "Silver",
-//     date: "2024-01-14"
-//   },
-//   {
-//     id: 3,
-//     userId: "USR003",
-//     name: "Mike Davis",
-//     income: "$2,100.75",
-//     level: "Platinum",
-//     date: "2024-01-13"
-//   },
-//   {
-//     id: 4,
-//     userId: "USR004",
-//     name: "Emily Wilson",
-//     income: "$650.25",
-//     level: "Bronze",
-//     date: "2024-01-12"
-//   },
-//   {
-//     id: 5,
-//     userId: "USR005",
-//     name: "David Brown",
-//     income: "$1,800.00",
-//     level: "Gold",
-//     date: "2024-01-11"
-//   }
-// ];
-
 export default function ServiceGenerationIncome() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
