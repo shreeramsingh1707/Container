@@ -3,7 +3,7 @@ import PageMeta from "../../components/common/PageMeta";
 import DashboardMetricCard from "../../components/dashboard/DashboardMetricCard";
 import AccountDetailsCard from "../../components/dashboard/AccountDetailsCard";
 import BusinessDetailsCard from "../../components/dashboard/BusinessDetailsCard";
-import { incomeStreamsApi, IncomeStreams } from "../../services/api";
+import { incomeStreamsApi, IncomeStreams,businessApi,businessApiType } from "../../services/api";
 interface WalletData {
   mineWallet: number;
   nodeWallet: number;
@@ -23,7 +23,9 @@ export default function Home() {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [incomeData, setIncomeData] = useState<IncomeStreams[]>([]);
+  const [businessData, setbusinessData] = useState<businessApiType[]>([]);
   console.log("Income Data: jjh", wallet);
+  console.log("Income Data: businessData", businessData);
   //hello world
   useEffect(() => {
     const fetchData = async () => {
@@ -39,11 +41,14 @@ export default function Home() {
       try {
         // 🔥 WAIT for API response
         const response = await incomeStreamsApi.getAll(0, 25, 'ACTIVE', nodeId);
+        const response2 = await businessApi.getAll(0, 25, 'ACTIVE', nodeId);
 
         console.log("Income Streams Real Response:", response);
+        console.log("Income Streams Real Response:2", response2);
 
         if (response.content && response.content.length > 0) {
           setIncomeData(response.content);
+          setbusinessData(response2.content);
         } else {
           console.warn("Income streams empty");
         }
@@ -57,7 +62,16 @@ export default function Home() {
     fetchData();
   }, []);
 
-
+  const cardProfile = (incomeData?.[0]?.serviceGenerationAmount ?? 0)
+    + (incomeData?.[0]?.clubIncomeAmount ?? 0)
+    + (incomeData?.[0]?.rewardIncomeAmount ?? 0)
+    + (incomeData?.[0]?.fastTrackBonusAmount ?? 0)
+    + (incomeData?.[0]?.miningProfitSharingAmount ?? 0)
+    + (incomeData?.[0]?.miningGenerationIncomeAmount ?? 0)
+    + (incomeData?.[0]?.nodeBusinessSharingAmount ?? 0)
+    + (incomeData?.[0]?.matchingIncomeAmount ?? 0);
+    const bigCardProfile = wallet.mineWallet + wallet.nodeWallet + wallet.capitalWallet;
+    const totalProfile = cardProfile + bigCardProfile;
   const fetchWalletData = async (nodeId: string) => {
     try {
       const url = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=0&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=${nodeId}`;
@@ -103,7 +117,7 @@ export default function Home() {
             <div className="text-right">
               <p className="text-sm text-blue-200 dark:text-blue-300">Total Portfolio Value</p>
               <p className="text-2xl font-bold text-white">
-                ${wallet.totalCredit.toFixed(2)}
+                ${totalProfile.toFixed(2)}
               </p>
             </div>
           </div>
@@ -186,7 +200,7 @@ export default function Home() {
               />
             </div>
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
-              <DashboardMetricCard title="Matching Income" amount={(incomeData?.[0]?.serviceGenerationAmount ?? 0).toString()}
+              <DashboardMetricCard title="Matching Income" amount={(incomeData?.[0]?.matchingIncomeAmount ?? 0).toString()}
                 viewAllLink="/StyloCoin/matchingIncome"
               />
             </div>
@@ -239,7 +253,7 @@ export default function Home() {
             </div>
 
             <div className="col-span-12 lg:col-span-7">
-              <BusinessDetailsCard />
+              <BusinessDetailsCard businessData={businessData}/>
             </div>
           </div>
         </main>

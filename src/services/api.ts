@@ -16,6 +16,7 @@ export const getAuthToken = (): string | null => {
 const createHeaders = (): HeadersInit => {
   const token = getAuthToken();
   return {
+    "Accept": "application/json",
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` })
   };
@@ -149,6 +150,22 @@ export interface SubscriptionType {
   isDeleted?: boolean;
   isGenericFlag?: boolean;
 }
+export interface WalletAddressType {
+  wallet: string;
+  address: string,
+  createdAt: string,
+  status: string,
+  // Additional fields for updates
+  notesG11nBigTxt?: string | null;
+  effectiveDateTime?: string;
+  saveStateCodeFkId?: string;
+  activeStateCodeFkId?: string;
+  recordStateCodeFkId?: string;
+  createdDatetime?: string;
+  lastModifiedDateTime?: string;
+  isDeleted?: boolean;
+  isGenericFlag?: boolean;
+}
 export interface IncomeStreams {
   individualIncomeSummaryPkId: number | null;
   serviceGenerationAmount: number;
@@ -159,6 +176,33 @@ export interface IncomeStreams {
   miningProfitSharingAmount?: number;
   miningGenerationIncomeAmount?: number;
   nodeBusinessSharingAmount?: number;
+  userNodeId:number,
+  userName:string
+  // Additional fields for updates
+  notesG11nBigTxt?: string | null;
+  effectiveDateTime?: string;
+  saveStateCodeFkId?: string;
+  activeStateCodeFkId?: string;
+  recordStateCodeFkId?: string;
+  createdDatetime?: string;
+  lastModifiedDateTime?: string;
+  isDeleted?: boolean;
+  isGenericFlag?: boolean;
+}
+export interface businessApiType {
+  directTeam: number | null;
+  totalTeam: number;
+  teamBusiness: number,
+  totalActiveTeamLeft: number;
+  totalActiveTeamRight?: number;
+  strongLegTeam?: number;
+  weakerLegTeam?: number;
+  carryForwardLeft?: number;
+  carryForwardRight?: number;
+  currentMiningBusinessLeft:number,
+  currentMiningBusinessRight:number,
+  totalMiningBusinessLeft:number,
+  totalMiningBusinessRight:number,
   userNodeId:number,
   userName:string
   // Additional fields for updates
@@ -249,6 +293,20 @@ export const incomeTypeApi = {
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/admin/deleteIncomeType/${id}`, 'DELETE')
 };
+export const walletAddressApi={
+   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{ content: WalletData[], totalElements: number }> =>
+    apiCall<any>(`/api/individual/getUserWalletAddress?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`).then(response => ({
+      content: response.data || [],
+      totalElements: response.count || 0
+    })),
+}
+export const businessApi={
+  getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE', userNodeId?: string | null): Promise<{ content: businessApiType[], totalElements: number }> =>
+    apiCall<any>(`/api/individual/getBusinessDetails?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=${userNodeId || 'null'}`).then(response => ({
+      content: response|| [],
+      totalElements: response.count || 0
+ })),
+}
 export const subscriptionIncomeTypeApi = {
   // Get all subscription types with pagination and filtering
   getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE'): Promise<{ content: SubscriptionType[], totalElements: number }> =>
@@ -349,6 +407,14 @@ export interface WalletTransferRequest {
   remarks?: string;
   confirmedAt?: null;
 }
+export interface WalletAddressRequest {
+  walletAdresPkId?: null;
+  selectedWallet?: string;
+  transactionId?: null;
+  address: string;
+  // createdAt: string;
+  status: string;
+}
  
 // Wallet Transaction API functions
 export const walletTransactionApi = {
@@ -387,6 +453,14 @@ export const walletTransferApi = {
       (response) => response.data?.[0] || response
     ),
 };
+export const addwalletAddressApi = {
+  // Create wallet transfer
+  create: (data: WalletAddressRequest): Promise<any> =>
+    apiCall<any>('/api/individual/addUserWalletAddress', 'POST', data).then(
+      (response) => response.data?.[0] || response
+    ),
+};
+
  
 // Individual Income Summary interfaces
 export interface IndividualIncomeSummary {
