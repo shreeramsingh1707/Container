@@ -30,7 +30,7 @@ export default function RankAndReward() {
     try {
       setIsLoading(true);
 
-      const url = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getIndividualRankReward?page=0&size=50&filterBy=ACTIVE&inputPkId=null&inputFkId=NODE38359974`;
+      const url = `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getIndividualRankReward?page=0&size=50&filterBy=ACTIVE&inputPkId=null&inputFkId=NODE38359974`;
 
       const response = await fetch(url);
       const apiRes = await response.json();

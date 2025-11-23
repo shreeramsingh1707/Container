@@ -24,7 +24,7 @@ const IncomeSummary: React.FC = () => {
       setLoading(true);
 
       const API_URL =
-        `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getIncomeSummary` +
+        `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getIncomeSummary` +
         `?page=0&size=50&filterBy=ACTIVE&inputPkId=null&inputFkId=${loggedInNodeId}`;
 
       // const res = await axios.get(API_URL);

@@ -32,7 +32,7 @@ const AccountDetailsCard: React.FC = () => {
           return;
         }
  
-        const apiUrl = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/users/getUser?page=0&size=50&filterBy=ACTIVE&inputPkId=null&inputFkId=${user.nodeId}`;
+        const apiUrl = `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/users/getUser?page=0&size=50&filterBy=ACTIVE&inputPkId=null&inputFkId=${user.nodeId}`;
         const response = await fetch(apiUrl);
         const result = await response.json();
  

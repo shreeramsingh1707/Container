@@ -31,7 +31,7 @@ export default function AccountStatement() {
  
   const fetchAccountStatement = async (nodeId: string) => {
     try {
-      const url = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getAccountStatement?page=0&size=50&filterBy=ACTIVE&inputPkId=null&inputFkId=${nodeId}`;
+      const url = `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getAccountStatement?page=0&size=50&filterBy=ACTIVE&inputPkId=null&inputFkId=${nodeId}`;
       const res = await fetch(url);
       const data = await res.json();
  

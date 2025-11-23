@@ -268,7 +268,7 @@ const fetchAllTeamData = async () => {
     setIsLoading(true);
 
     const res = await fetch(
-      `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getAllDirectMember?page=0&size=25&filterBy=ACTIVE&inputPkId=${nodeId}&inputFkId=null`
+      `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getAllDirectMember?page=0&size=25&filterBy=ACTIVE&inputPkId=${nodeId}&inputFkId=null`
     );
 
     const json = await res.json();

@@ -34,7 +34,7 @@ export default function DepositConfirmation() {
     console.log("paymentId is setting",paymentId)
     try {
       const res = await axios.get(
-        `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/deposit/history/${userNodeId}`
+        `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/deposit/history/${userNodeId}`
       );
   
       const list: HistoryItem[] = res.data.data;

@@ -74,7 +74,7 @@ export default function Home() {
     const totalProfile = cardProfile + bigCardProfile;
   const fetchWalletData = async (nodeId: string) => {
     try {
-      const url = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=0&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=${nodeId}`;
+      const url = `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getWalletData?page=0&size=25&filterBy=ACTIVE&inputPkId=null&inputFkId=${nodeId}`;
       const response = await fetch(url);
       const data = await response.json();
 

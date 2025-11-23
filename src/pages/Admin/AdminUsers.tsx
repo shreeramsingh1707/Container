@@ -94,7 +94,7 @@ export default function AdminUsers() {
       let page = 0;
       let size = 100;
 
-      const url = `http://minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/users/getUser?page=0&size=25&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
+      const url = `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/users/getUser?page=0&size=25&filterBy=${apiStatusFilter}&inputPkId=null&inputFkId=null`;
       const response = await fetch(url);
       const data = await response.json();
 
