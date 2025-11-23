@@ -19,7 +19,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
 
   const [searchTerm, setSearchTerm] = useState("");
   const [isUserActive,setIsUserActive]=useState(false);
-    
+    console.log("UserManagementTable rendered with users:", users);
   const token = localStorage.getItem("token");
 
   // Safe filtering (no crash even if users = undefined)
@@ -85,6 +85,7 @@ const UserManagementTable: React.FC<UserManagementTableProps> = ({
           ) : (
             filteredUsers.map((user) => {
               const wallet = getWallet(user.userPkId);
+              console.log("Rendering user: all is well", wallet);
 
               return (
                 <tr

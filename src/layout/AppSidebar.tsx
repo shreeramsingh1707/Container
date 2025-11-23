@@ -192,6 +192,7 @@ const adminItems: NavItem[] = [
       { name: "Manage Ranks", path: "admin/ranks", pro: false },
       { name: "Manage Income Types", path: "admin/income-types", pro: false },
       { name: "Manage Subscription", path: "admin/subscription", pro: false },
+      { name: "Manage Withdrawal", path: "admin/withdrawal", pro: false },
     ],
   },
   {

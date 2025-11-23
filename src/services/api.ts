@@ -150,6 +150,24 @@ export interface SubscriptionType {
   isDeleted?: boolean;
   isGenericFlag?: boolean;
 }
+export interface WithdrawalType {
+  withdrawalRequestPkId: number | null;
+  userName: string;
+  userNodeId: string;
+  finalAmount: number,
+  amount: number;
+  createdDatetime?: string | null;
+  subscriptionEndDateTime?: number | null;
+  // Additional fields for updates
+  notesG11nBigTxt?: string | null;
+  effectiveDateTime?: string;
+  saveStateCodeFkId?: string;
+  activeStateCodeFkId?: string;
+  recordStateCodeFkId?: string;
+  lastModifiedDateTime?: string;
+  isDeleted?: boolean;
+  isGenericFlag?: boolean;
+}
 export interface WalletAddressType {
   wallet: string;
   address: string,
@@ -327,6 +345,13 @@ export const subscriptionIncomeTypeApi = {
   delete: (id: number): Promise<void> =>
     apiCall<void>(`/api/admin/deleteSubscriptionDefinition/${id}`, 'DELETE')
 };
+export const manageWithdrawalApi={
+  getAll: (page: number = 0, size: number = 25, filterBy: string = 'ACTIVE'): Promise<{ content: WithdrawalType[], totalElements: number }> =>
+    apiCall<any>(`/api/individual/getWithdrawalRequest?page=${page}&size=${size}&filterBy=${filterBy}&inputPkId=null&inputFkId=null`).then(response => ({
+      content: response.data || [],
+      totalElements: response.count || 0
+    })),
+}
  
 // Wallet Data API functions
 export const walletDataApi = {
