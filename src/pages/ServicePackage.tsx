@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "../components/ui/table";
 import { Modal } from "../components/ui/modal";
-import { AddMiningPackageRequest, miningPackageApi, MiningPackageItem } from "../services/api";
+import { AddMiningPackageRequest, miningPackageApi, MiningPackageItem ,walletDataApi} from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
 interface MiningReportRow {
@@ -51,6 +51,10 @@ export default function ServicePackage() {
   const [updating, setUpdating] = useState(false);
   const [editError, setEditError] = useState("");
   const [editSuccess, setEditSuccess] = useState("");
+  const [otpData,setOtpData]=useState("");
+  const [isOtpMatched, setIsOtpMatched] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
 
   const [data, setData] = useState<MiningReportRow[]>([]);
 
@@ -191,9 +195,38 @@ export default function ServicePackage() {
     }
   };
 
-  const handleSendOTP = () => {
-    // Hook up to real OTP API when available
-    console.log("Send OTP clicked");
+  const handleSendOTP = async () => {
+    console.log("Useer email--->",user?.email)
+    setOtpLoading(true);
+    try {
+    
+      // Simulate API call
+       const response = await walletDataApi.addOtp(user?.email ,user?.nodeId || null);
+       console.log(response);
+       setOtpData(response?.id || "");
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setIsOtpSent(true);
+      setSuccess("OTP sent successfully to your registered email");
+    } catch (err) {
+      setError("Failed to send OTP. Please try again.");
+    } finally {
+      setOtpLoading(false);
+    }
+  };
+
+   const handleVerifyOTP = async () => {
+    console.log("Useer oneTimePassword--->",otp)
+    console.log("sent oneTimePassword--->",otpData)
+   if(otp==otpData){
+    console.log("otp matched")
+    setIsOtpMatched(true);
+    setSuccess("OTP Verified successfully.");
+   }
+   else{
+    console.log("otp NOT matched")
+    setError(" OTP MisMatched. Please try again.");
+    setIsOtpMatched(false);
+   }
   };
 
   const handleEdit = (item: MiningReportRow) => {
@@ -371,13 +404,38 @@ export default function ServicePackage() {
                       className="dark:bg-dark-900"
                     />
                   </div>
-                  <Button
+                  {/* <Button
                     variant="outline"
                     onClick={handleSendOTP}
                     className="px-4 py-2 text-sm whitespace-nowrap bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
                   >
                     Send OTP
-                  </Button>
+                  </Button> */}
+                  <button
+                      type="button"
+                      onClick={handleSendOTP}
+                      disabled={otpLoading || isOtpSent}
+                      className="px-6 py-4 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 whitespace-nowrap"
+                    >
+                      {otpLoading ? (
+                        <div className="flex items-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                          Sending...
+                        </div>
+                      ) : isOtpSent ? (
+                        "OTP Sent"
+                      ) : (
+                        "Send OTP"
+                      )}
+                    </button>
+                    {
+                      isOtpSent &&   
+                      <button
+                      type="button"
+                      onClick={handleVerifyOTP}
+                      className="px-6 py-4 bg-blue-500 hover:bg-blue-600 disabled:bg-blue-500/50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all duration-300 whitespace-nowrap"
+                     >Verify</button>
+                    }
                 </div>
               </div>
 
@@ -412,7 +470,7 @@ export default function ServicePackage() {
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || !isOtpMatched}
                   className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? "Submitting..." : "Submit"}
