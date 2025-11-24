@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
+import api, {  WithdrawalRequest, withdrawalRequestApi } from "../services/api";
+
 
 interface WithdrawRecord {
   id: number;
@@ -13,121 +15,46 @@ interface WithdrawRecord {
   remarks: string;
 }
 
+const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
+const nodeId = user?.nodeId;
+
 export default function WithdrawReport() {
   const [searchTerm, setSearchTerm] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [withdrawalRequests, setWithdrawalRequests] = useState<WithdrawalRequest[]>([]);
+  const [loadingRequests, setLoadingRequests] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   // Mock data for withdraw report
-  const [withdrawRecords] = useState<WithdrawRecord[]>([
-    {
-      id: 1,
-      withdrawFrom: "Mine Wallet",
-      amount: 1500.00,
-      fee: 15.00,
-      gross: 1485.00,
-      addressBank: "0x1234567890abcdef1234567890abcdef12345678",
-      date: "2025-01-15",
-      status: "completed",
-      transactionHash: "0xabc123def456ghi789jkl012mno345pqr678stu901",
-      remarks: "Withdrawal to personal wallet"
-    },
-    {
-      id: 2,
-      withdrawFrom: "Package Wallet",
-      amount: 2500.00,
-      fee: 25.00,
-      gross: 2475.00,
-      addressBank: "0xabcdef1234567890abcdef1234567890abcdef12",
-      date: "2025-01-14",
-      status: "processing",
-      transactionHash: "0xdef456ghi789jkl012mno345pqr678stu901vwx234",
-      remarks: "Package withdrawal"
-    },
-    {
-      id: 3,
-      withdrawFrom: "Capital Wallet",
-      amount: 750.00,
-      fee: 7.50,
-      gross: 742.50,
-      addressBank: "0x9876543210fedcba9876543210fedcba98765432",
-      date: "2025-01-13",
-      status: "pending",
-      transactionHash: "0xghi789jkl012mno345pqr678stu901vwx234yza567",
-      remarks: "Capital withdrawal request"
-    },
-    {
-      id: 4,
-      withdrawFrom: "Mine Wallet",
-      amount: 3200.00,
-      fee: 32.00,
-      gross: 3168.00,
-      addressBank: "0x5555555555555555555555555555555555555555",
-      date: "2025-01-12",
-      status: "completed",
-      transactionHash: "0xjkl012mno345pqr678stu901vwx234yza567bcd890",
-      remarks: "Large withdrawal"
-    },
-    {
-      id: 5,
-      withdrawFrom: "Node Wallet",
-      amount: 1800.00,
-      fee: 18.00,
-      gross: 1782.00,
-      addressBank: "0x1111111111111111111111111111111111111111",
-      date: "2025-01-11",
-      status: "failed",
-      transactionHash: "0xmno345pqr678stu901vwx234yza567bcd890efg123",
-      remarks: "Failed due to insufficient gas"
-    },
-    {
-      id: 6,
-      withdrawFrom: "Package Wallet",
-      amount: 950.00,
-      fee: 9.50,
-      gross: 940.50,
-      addressBank: "0x2222222222222222222222222222222222222222",
-      date: "2025-01-10",
-      status: "completed",
-      transactionHash: "0xpqr678stu901vwx234yza567bcd890efg123hij456",
-      remarks: "Regular withdrawal"
-    },
-    {
-      id: 7,
-      withdrawFrom: "Mine Wallet",
-      amount: 4200.00,
-      fee: 42.00,
-      gross: 4158.00,
-      addressBank: "0x3333333333333333333333333333333333333333",
-      date: "2025-01-09",
-      status: "processing",
-      transactionHash: "0xstu901vwx234yza567bcd890efg123hij456klm789",
-      remarks: "Premium withdrawal"
-    },
-    {
-      id: 8,
-      withdrawFrom: "Capital Wallet",
-      amount: 1650.00,
-      fee: 16.50,
-      gross: 1633.50,
-      addressBank: "0x4444444444444444444444444444444444444444",
-      date: "2025-01-08",
-      status: "completed",
-      transactionHash: "0xvwx234yza567bcd890efg123hij456klm789nop012",
-      remarks: "Capital management"
-    }
-  ]);
+  // const [withdrawRecords] = useState<WithdrawRecord[]>([
+  // ]);
 
+   // Fetch withdrawal requests
+   useEffect(() => {
+    const fetchWithdrawalRequests = async () => {
+      setLoadingRequests(true);
+      try {
+        const response = await withdrawalRequestApi.getAll(currentPage, 25, 'ACTIVE', user?.nodeId || null);
+        setWithdrawalRequests(response.content || []);
+      } catch (err) {
+        console.error('Error fetching withdrawal requests:', err);
+        setError('Failed to load withdrawal requests');
+      } finally {
+        setLoadingRequests(false);
+      }
+    };
+    fetchWithdrawalRequests();
+  }, [currentPage, user?.nodeId]);
   // Filter records based on search term
-  const filteredRecords = withdrawRecords.filter(record =>
-    record.withdrawFrom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.addressBank.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.transactionHash.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    record.remarks.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRecords = withdrawalRequests.filter(record =>
+    record.userNodeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    record.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Calculate total amount
-  const totalAmount = filteredRecords.reduce((sum, record) => sum + record.gross, 0);
+  const totalAmount = filteredRecords.reduce((sum, record) => sum + record.amount, 0);
 
   // Pagination
   const totalPages = Math.ceil(filteredRecords.length / rowsPerPage);
