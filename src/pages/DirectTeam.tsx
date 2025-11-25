@@ -370,14 +370,14 @@ const filteredData = directTeamData.filter(member =>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Mining Package</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Position</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Status</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Direct Team</th>
+                  {/* <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Direct Team</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Total Team</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Direct Business</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Team Business</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Team Business</th> */}
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Rank</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Joining Date</th>
                   <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Activation Date</th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Action</th>
+                  {/* <th className="text-left py-3 px-4 font-medium text-gray-900 dark:text-white">Action</th> */}
                 </tr>
               </thead>
               <tbody>
@@ -405,16 +405,17 @@ const filteredData = directTeamData.filter(member =>
                             ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
                             : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                         }`}>
-                          {member.status}
+                          {member.position}
                         </span>
                       </td>
                       {/* <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.directTeam}</td>
                       <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.totalTeam}</td>
                       <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.directBusiness}</td>
                       <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.teamBusiness}</td> */}
-                      <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.rank}</td>
-                      <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{member.joiningDate}</td>
-                      <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{member.activationDate}</td>
+                      <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">{member.status}</td>
+                      <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{member.rank}</td>
+                      <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{(member.joiningDate).split('T')[0]}</td>
+                      <td className="py-3 px-4 text-gray-600 dark:text-gray-300">{(member.activationDate).split('T')[0]}</td>
                       <td className="py-3 px-4">
                         <button className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                           <EyeIcon className="w-4 h-4" />
