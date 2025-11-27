@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 interface IncomeSummary {
-  incomeSummaryPkId: number;
-  transactionType: string;
-  bonusAmount: number;
+  commissionLedgerPkId: number;
+  incomeType: string;
+  amount: number;
+  note:string;
+  isSettled:boolean,
   effectiveDateTime: string;
 }
 
@@ -24,7 +26,7 @@ const IncomeSummary: React.FC = () => {
       setLoading(true);
 
       const API_URL =
-        `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getIncomeSummary` +
+        `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/individual/getCommissionLedger` +
         `?page=0&size=50&filterBy=ACTIVE&inputPkId=null&inputFkId=${loggedInNodeId}`;
 
       // const res = await axios.get(API_URL);
@@ -47,11 +49,11 @@ const IncomeSummary: React.FC = () => {
   // Filter logic for Search + Transaction Type
   const filteredData = incomeData.filter((item) => {
     const matchesSearch =
-      item.transactionType.toLowerCase().includes(search.toLowerCase()) ||
-      String(item.bonusAmount).includes(search);
+      item.incomeType.toLowerCase().includes(search.toLowerCase()) ||
+      String(item.amount).includes(search);
 
     const matchesType =
-      selectedType === "ALL" || item.transactionType === selectedType;
+      selectedType === "ALL" || item.incomeType === selectedType;
 
     return matchesSearch && matchesType;
   });
@@ -113,12 +115,12 @@ const IncomeSummary: React.FC = () => {
       {/* Table Section */}
       <div className="bg-gray-800 rounded-xl border border-gray-700 shadow-2xl overflow-hidden">
       <table className="w-full">
-        <thead className="bg-gradient-to-r from-gray-800 to-gray-750 border-b border-gray-700">
+        <thead className="bg-gradient-to-r from-gray-800 to-gray-800 border-b border-gray-700">
             <tr className="border-b border-gray-700">
               <th className="p-2">#</th>
-              <th className="p-2">Date</th>
               <th className="p-2">Transaction Type</th>
               <th className="p-2">Bonus</th>
+              <th className="p-2">Remarks</th>
             </tr>
           </thead>
 
@@ -137,11 +139,11 @@ const IncomeSummary: React.FC = () => {
               </tr>
             ) : (
               filteredData.map((item, index) => (
-                <tr key={item.incomeSummaryPkId} className="border-b border-gray-700">
-                  <td className="py-4 px-6 text-white font-medium">{index + 1}</td>
-                  <td className="py-4 px-6 text-gray-300">{item.effectiveDateTime}</td>
-                  <td className="py-4 px-6 text-white font-medium">{item.transactionType}</td>
-                  <td className="py-4 px-6">₹ {item.bonusAmount}</td>
+                <tr key={item.commissionLedgerPkId} className="border-b border-gray-700">
+                  <td  className="py-5 px-16 text-gray-300">{index + 1}</td>
+                  <td className="py-5 px-16 text-gray-300">{item.incomeType}</td>
+                  <td className="py-5 px-16 text-gray-300">₹ {item.amount}</td>
+                  <td className="py-5 px-16 text-gray-300">{item.note}</td>
                 </tr>
               ))
             )}
