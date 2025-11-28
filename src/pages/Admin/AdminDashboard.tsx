@@ -4,6 +4,7 @@ import PageMeta from '../../components/common/PageMeta';
 import MetricCard from '../../components/admin/MetricCard';
 import { User, WalletData, usersApi, walletDataApi,ieDataApi,DataApi } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import UserMetricCard from './UserMetricCard';
  
 export default function AdminDashboard() {
   const { user } = useAuth();
@@ -221,7 +222,7 @@ export default function AdminDashboard() {
          
           {/* First Row - User and Wallet Metrics */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <MetricCard
+            <UserMetricCard
               title="Total Users"
               value={dataApi?.response?.totalUser || 0.00}
               icon={
@@ -326,7 +327,7 @@ export default function AdminDashboard() {
               chart="bar"
               // onClick={() => handleCardClick('totalWithdrawals')}
             />
-            <MetricCard
+            <UserMetricCard
               title="Active Users"
               value={dataApi?.response?.totalActiveUser || 0.00}
               icon={
@@ -354,7 +355,7 @@ export default function AdminDashboard() {
               chart="line"
               // onClick={() => handleCardClick('directIncome')}
             />
-            <MetricCard
+            <UserMetricCard
               title="Admin Users"
               value={dataApi?.response?.totalAdminUser || 0.00}
               icon={
@@ -366,7 +367,7 @@ export default function AdminDashboard() {
               chart="bar"
               // onClick={() => handleCardClick('adminUsers')}
             />
-            <MetricCard
+            <UserMetricCard
               title="Normal Users"
               value={dataApi?.response?.totalNormalUser || 0.00}
               icon={
@@ -394,7 +395,7 @@ export default function AdminDashboard() {
               chart="bar"
               // onClick={() => handleCardClick('totalDeposits')}
             />
-            <MetricCard
+            <UserMetricCard
               title="Inactive Users"
               value={dataApi?.response?.totalInactiveUser || 0.00}
               icon={
