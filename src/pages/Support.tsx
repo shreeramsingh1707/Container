@@ -565,6 +565,7 @@ export default function Support() {
                 <thead className="bg-gradient-to-r from-gray-800 to-gray-750 border-b border-gray-700">
                   <tr>
                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">#</th>
+                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">UserNodeId</th>
                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Subject</th>
                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Message</th>
                     <th className="text-left py-4 px-6 font-bold text-white text-sm uppercase tracking-wider">Priority</th>
@@ -600,6 +601,9 @@ export default function Support() {
                       <tr key={ticket.supportTicketPkId || index} className="hover:bg-gray-700/50 transition-colors">
                         <td className="py-4 px-6 text-white font-medium">
                           {ticket.supportTicketPkId || index + 1}
+                        </td>
+                         <td className="py-4 px-6 text-white font-medium">
+                          {mapCategoryToDisplay(ticket.userNodeId)}
                         </td>
                         <td className="py-4 px-6 text-white font-medium">
                           {mapCategoryToDisplay(ticket.category)}
