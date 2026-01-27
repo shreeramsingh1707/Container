@@ -93,6 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         : (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080');
       
       console.log('Attempting login with:', { username, apiBaseUrl });
+      console.log('Keep logged in:123', apiBaseUrl);
 
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 25000);

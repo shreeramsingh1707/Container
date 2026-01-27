@@ -1,4 +1,4 @@
-import loginImg from "../images/loginImg.jpg";
+import Container from "../images/Container.jpg";
 export default function GridShape() {
   return (
     <>
@@ -17,7 +17,7 @@ export default function GridShape() {
         "
       >
         <img
-          src={loginImg}
+          src={Container}
           alt="grid"
           className="w-full h-auto object-contain"
         />

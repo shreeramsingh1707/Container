@@ -79,7 +79,7 @@ export default function SignUpForm() {
         <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Sign Up for StyloCoin
+              Sign Up for Container Shipment
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Create your account to get started!
@@ -233,7 +233,7 @@ export default function SignUpForm() {
                 </div>
 
                 {/* <!-- Referral Code and Position Row --> */}
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                {/* <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div>
                     <Label>
                       Referral Code
@@ -266,7 +266,7 @@ export default function SignUpForm() {
                       <option value="Right">Right</option>
                     </select>
                   </div>
-                </div>
+                </div> */}
                 {/* <!-- Checkbox --> */}
                 <div className="flex items-center gap-3">
                   <Checkbox

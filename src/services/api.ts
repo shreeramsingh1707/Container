@@ -9,7 +9,8 @@
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.trim() || 
-  "https://Minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com";
+  // "https://Minecryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com";
+  "http://containershipment-app-env.eba-p7ijagki.ap-south-1.elasticbeanstalk.com"
 
  
 // Get auth token from localStorage
