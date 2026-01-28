@@ -8,10 +8,10 @@ const LayoutContent: React.FC = () => {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
 
   return (
-    <div className="min-h-screen xl:flex">
+    <div >
       <div>
         {/* <AppSidebar /> */}
-        <Backdrop />
+        {/* <Backdrop /> */}
       </div>
       <div
         className={`flex-1 transition-all duration-300 ease-in-out ${
