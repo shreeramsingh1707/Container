@@ -45,13 +45,40 @@ const AppHeader: React.FC = () => {
 
       <div className="flex flex-col items-center justify-between flex-grow lg:flex-row ">
         <div className="flex items-center justify-between w-full gap-2 px-3 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
-          <div className="relative w-full pl-12">
+
+          <div className="flex items-center w-full pl-12">
+            {/* Logo */}
             <img
               src={navbarLogo}
               className="h-14 w-auto object-contain cursor-pointer"
-              // className="w-[72.41px] h-[72.42px]  object-contain "
+              alt="Buy To Let"
             />
+
+            {/* NAV LINKS (Desktop) */}
+            <nav className="hidden lg:flex items-center gap-8 ml-100 pl-12">
+              <Link
+                to="/"
+                className="text-white text-sm font-medium hover:text-blue-400 transition"
+              >
+                Home
+              </Link>
+
+              <Link
+                to="/buy"
+                className="text-white text-sm font-medium hover:text-blue-400 transition"
+              >
+                Buy
+              </Link>
+
+              <Link
+                to="/rent"
+                className="text-white text-sm font-medium hover:text-blue-400 transition"
+              >
+                Rent
+              </Link>
+            </nav>
           </div>
+
           {/* <button
             className="items-center justify-center w-10 h-10 text-gray-500 border-gray-200 rounded-lg z-99999 dark:border-gray-800 lg:flex dark:text-gray-400 lg:h-11 lg:w-11 lg:border"
             onClick={handleToggle}
