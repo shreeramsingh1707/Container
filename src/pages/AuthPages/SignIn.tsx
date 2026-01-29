@@ -26,9 +26,9 @@ export default function SignIn() {
       </div>
 
       {/* FOOTER WITHOUT ANY SCROLL */}
-      <div className="shrink-0">
+      {/* <div className="shrink-0">
         <Footer />
-      </div>
+      </div> */}
     </div>
   );
 }
