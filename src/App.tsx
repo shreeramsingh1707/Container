@@ -76,45 +76,18 @@ export default function App() {
 
           {/* Protected Dashboard Layout */}
           <Route element={<ProtectedRoute />}>
-            <Route path="/StyloCoin/" element={<AppLayout />}>
+            <Route path="/containerShipment/" element={<AppLayout />}>
               <Route index element={<ConditionalHome />} />
               <Route path="dashboard" element={<Home />} />
 
             {/* Others Page */}
             <Route path="profile" element={<UserProfiles />} />
-            <Route path="wallet" element={<Wallet />} />
-            <Route path="user-wallet" element={<UserWallet />} />
-            <Route path="service-package" element={<ServicePackage />} />
-            <Route path="mining-package" element={<MiningPackage />} />
-            <Route path="directTeam" element={<DirectTeam />} />
-            <Route path="allTeam" element={<AllTeam />} />
-            <Route path="businessHistory" element={<BusinessHistory />} />
-            <Route path="serviceGeneration" element={<ServiceGenerationIncome />} />
-            <Route path="matchingIncome" element={<MatchingIncome />} />
-            <Route path="clubIncome" element={<ClubIncome />} />
-            <Route path="rewardIncome" element={<RewardIncome />} />
-            <Route path="fastTrackBonus" element={<FastTrackBonus />} />
-            <Route path="miningProfitSharing" element={<MiningProfitSharing />} />
-            <Route path="miningGeneration" element={<MiningGenerationIncome />} />
-            <Route path="nodeBusinessSharing" element={<NodeBusinessSharing />} />
-            <Route path="depositFund" element={<DepositFund />} />
-            {/* <Route path="depositFund" element={<Deposit />} /> */}
-            <Route path="depositConfirmation" element={<DepositConfirmation />} />
-            <Route path="depositInvoice" element={<DepositInvoice />} />
-            <Route path="rankAndReward" element={<RankAndReward />} />
-            <Route path="walletAddress" element={<WalletAddress />} />
-            <Route path="transferToNodeWallet" element={<TransferToNodeWallet />} />
-            <Route path="transferToCapitalWallet" element={<TransferToCapitalWallet />} />
-            <Route path="transferReport" element={<TransferFundReport />} />
-            <Route path="receiveReport" element={<ReceiveFundReport />} />
-            <Route path="withdrawReport" element={<WithdrawReport />} />
+            <Route path="buy" element={<Wallet />} />
+            <Route path="rent" element={<UserWallet />} />
+           
             <Route path="withdrawFund" element={<WithdrawFund />} />
-            <Route path="incomeSummary" element={<IncomeSummary />} />
-            <Route path="accountStatement" element={<AccountStatement />} />
-            <Route path="auth-test" element={<AuthTest />} />
             <Route path="support" element={<Support />} />
-            <Route path="calendar" element={<Calendar />} />
-            <Route path="blank" element={<Blank />} />
+      
 
             {/* Forms */}
             <Route path="form-elements" element={<FormElements />} />

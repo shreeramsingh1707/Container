@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
+// import { Link } from "react-router";
 import { useSidebar } from "../context/SidebarContext";
 import { ThemeToggleButton } from "../components/common/ThemeToggleButton";
 import NotificationDropdown from "../components/header/NotificationDropdown";
@@ -57,14 +57,14 @@ const AppHeader: React.FC = () => {
             {/* NAV LINKS (Desktop) */}
             <nav className="hidden lg:flex items-center gap-8 ml-100 pl-12">
               <Link
-                to="/"
+                to="/containerShipment/buy"
                 className="text-white text-sm font-medium hover:text-blue-400 transition"
               >
                 Home
               </Link>
 
               <Link
-                to="/buy"
+                to="/containerShipment/rent"
                 className="text-white text-sm font-medium hover:text-blue-400 transition"
               >
                 Buy
