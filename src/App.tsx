@@ -18,31 +18,8 @@ import Blank from "./pages/Blank";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
 import Home from "./pages/Dashboard/Home";
-import Wallet from "./pages/Wallet";
+import Buy from "./pages/Buy";
 import UserWallet from "./pages/UserWallet";
-import ServicePackage from "./pages/ServicePackage";
-import MiningPackage from "./pages/MiningPackage";
-import DirectTeam from "./pages/DirectTeam";
-import AllTeam from "./pages/AllTeam";
-import BusinessHistory from "./pages/BusinessHistory";
-import ServiceGenerationIncome from "./pages/ServiceGenerationIncome";
-import MatchingIncome from "./pages/MatchingIncome";
-import ClubIncome from "./pages/ClubIncome";
-import RewardIncome from "./pages/RewardIncome";
-import FastTrackBonus from "./pages/FastTrackBonus";
-import MiningGenerationIncome from "./pages/MiningGenerationIncome";
-import MiningProfitSharing from "./pages/MiningProfitSharing";
-import NodeBusinessSharing from "./pages/NodeBusinessSharing";
-import DepositFund from "./pages/DepositFund";
-import DepositConfirmation from "./pages/DepositConfirmation";
-import TransferToNodeWallet from "./pages/TransferToNodeWallet";
-import TransferToCapitalWallet from "./pages/TransferToCapitalWallet";
-import TransferFundReport from "./pages/TransferFundReport";
-import ReceiveFundReport from "./pages/ReceiveFundReport";
-import DepositInvoice from "./pages/DepositInvoice";
-import RankAndReward from "./pages/RankAndReward";
-import WalletAddress from "./pages/WalletAddress";
-import WithdrawReport from "./pages/WithdrawReport";
 import WithdrawFund from "./pages/WithdrawFund";
 import IncomeSummary from "./pages/IncomeSummary";
 import AccountStatement from "./pages/AccountStatement";
@@ -82,7 +59,7 @@ export default function App() {
 
             {/* Others Page */}
             <Route path="profile" element={<UserProfiles />} />
-            <Route path="buy" element={<Wallet />} />
+            <Route path="buy" element={<Buy/>} />
             <Route path="rent" element={<UserWallet />} />
            
             <Route path="withdrawFund" element={<WithdrawFund />} />
