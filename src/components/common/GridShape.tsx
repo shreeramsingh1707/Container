@@ -8,11 +8,11 @@ export default function GridShape() {
           right-0
           top-0
           -z-1
-          w-full
-          max-w-[900px]
-          xl:max-w-[900px]
+          w-[105%]
+          h-[105%]
+          
           transform
-          -translate-y-48
+          -translate-y-32
           -translate-x-10
         "
       >
