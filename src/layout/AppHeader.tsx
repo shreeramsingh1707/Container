@@ -9,24 +9,22 @@ import { useAuth } from "../context/AuthContext";
 import { DropdownItem } from "../components/ui/dropdown/DropdownItem";
 import SupportSidebar from "../components/ui/support/SupportSidebar";
 const AppHeader: React.FC = () => {
+
+  const usersRef = useRef(null);
+  const manageUsersRef = useRef(null);
+  const [isManageUserOpen, setIsManageUserOpen] = useState(false);
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
   const [isUsersOpen, setIsUsersOpen] = useState(false);
   const [isWithDrawlOpen, setIsWithDrawlOpen] = useState(false);
   const [withdrawl, setWithdrawl] = useState(false);
   const [bankOpen, setBankOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
   const { user } = useAuth();
-  const handleToggle = () => {
-    if (window.innerWidth >= 991) {
-      toggleSidebar();
-    } else {
-      toggleMobileSidebar();
-    }
-  };
+
   function closeDropdown() {
     setIsOpen(false);
   }
+
   const inputRef = useRef<HTMLInputElement>(null);
   console.log('User in AppHeader:', isUserAdmin(user));
   useEffect(() => {
@@ -40,6 +38,59 @@ const AppHeader: React.FC = () => {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (usersRef.current && !usersRef.current.contains(target)) {
+        setIsUsersOpen(false);
+      }
+
+      if (manageUsersRef.current && !manageUsersRef.current.contains(target)) {
+        setIsManageUserOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
+      if (usersRef.current && !usersRef.current.contains(target)) {
+        setIsUsersOpen(false);
+      }
+
+      if (manageUsersRef.current && !manageUsersRef.current.contains(target)) {
+        setIsManageUserOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setIsUsersOpen(false);
+        setIsManageUserOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, []);
+
 
   return (
     <header className="sticky top-0 flex w-full bg-[#1f2937] border-gray-200 z-50 lg:border-b">
@@ -93,7 +144,7 @@ const AppHeader: React.FC = () => {
                 Monthly Interest
               </Link>}
               {/* Withdrawal DROPDOWN */}
-              {isUserAdmin(user) && <div className="relative">
+              {/* {isUserAdmin(user) && <div className="relative">
                 <button
                   onClick={() => setIsWithDrawlOpen(!isWithDrawlOpen)}
                   className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center gap-2 shadow-sm"
@@ -121,9 +172,9 @@ const AppHeader: React.FC = () => {
                     </Link>
                   </div>
                 )}
-              </div>}
+              </div>} */}
               {/* This is real Withdrawal */}
-              {isUserAdmin(user) && <div className="relative">
+              {/* {isUserAdmin(user) && <div className="relative">
                 <button
                   onClick={() => setWithdrawl(!withdrawl)}
                   className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center gap-2 shadow-sm"
@@ -144,80 +195,122 @@ const AppHeader: React.FC = () => {
                     </Link>
                   </div>
                 )}
-              </div>}
-              {/* USERS DROPDOWN */}
-              {isUserAdmin(user) && <div className="relative">
-                <button
-                  onClick={() => setIsUsersOpen(!isUsersOpen)}
-                  className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center gap-2 shadow-sm"
-                >
-                  Users
-                  <span className={`text-xs transition-transform ${isUsersOpen ? "rotate-180" : ""}`}>
-                    ▼
-                  </span>
-                </button>
+              </div>} */}
 
-                {isUsersOpen && (
-                  <div className="absolute left-0 mt-2 w-42 bg-white rounded-md shadow-lg py-2 z-50">
-                    <Link
-                      to="/containerShipment/all-user"
-                      onClick={() => setIsUsersOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      All Users
-                    </Link>
 
-                    <Link
-                      to="/containerShipment/active-user"
-                      onClick={() => setIsUsersOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Active Users
-                    </Link>
 
-                    <Link
-                      to="/containerShipment/inactive-user"
-                      onClick={() => setIsUsersOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Inactive Users
-                    </Link>
+              {
+                isUserAdmin(user) && <div className="flex items-center justify-between px-6 py-3">
 
-                    <Link
-                      to="/containerShipment/admin-user"
-                      onClick={() => setIsUsersOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Admin Users
-                    </Link>
+                  <div className="flex items-center gap-10">
+                    
+                    {/* NAV LINKS */}
+                    <nav className="hidden lg:flex items-center gap-6">
+
+                      {isUserAdmin(user) && (
+                        <Link
+                          to="/containerShipment/admin"
+                          className="text-gray-600 hover:text-blue-600 text-sm font-medium transition"
+                        >
+                          Dashboard
+                        </Link>
+                      )}
+
+                      {/* USERS DROPDOWN */}
+                      {isUserAdmin(user) && (
+                        <div className="relative" ref={usersRef}>
+                          <button
+                            onClick={() => setIsUsersOpen(!isUsersOpen)}
+                            className="flex items-center gap-1 text-gray-600 hover:text-blue-600 text-sm font-medium transition"
+                          >
+                            Users
+                            <span className={`transition-transform ${isUsersOpen ? "rotate-180" : ""}`}>
+                              ▼
+                            </span>
+                          </button>
+
+                          {isUsersOpen && (
+                            <div className="absolute top-10 left-0 w-48 bg-white border rounded-lg shadow-lg py-2">
+                              <Link
+                                to="/containerShipment/all-user"
+                                onClick={() => setIsUsersOpen(false)}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                All Users
+                              </Link>
+
+                              <Link
+                                to="/containerShipment/active-user"
+                                onClick={() => setIsUsersOpen(false)}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                Active Users
+                              </Link>
+
+                              <Link
+                                to="/containerShipment/inactive-user"
+                                onClick={() => setIsUsersOpen(false)}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                Inactive Users
+                              </Link>
+
+                              <Link
+                                to="/containerShipment/admin-user"
+                                onClick={() => setIsUsersOpen(false)}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                Admin Users
+                              </Link>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* MANAGE USER */}
+                      {isUserAdmin(user) && (
+                        <div className="relative" ref={manageUsersRef}>
+                          <button
+                            onClick={() => {
+                              setIsManageUserOpen(!isManageUserOpen);
+                              setIsUsersOpen(false);
+                            }}
+                            className="flex items-center gap-1 text-gray-600 hover:text-blue-600 text-sm font-medium transition"
+                          >
+                           Transactions
+                            <span className={`transition-transform ${isUsersOpen ? "rotate-180" : ""}`}>
+                              ▼
+                            </span>
+                          </button>
+
+                          {isManageUserOpen && (
+                            <div className="absolute top-10 left-0 w-48 bg-white border rounded-lg shadow-lg py-2">
+                              <Link
+                                to="/containerShipment/deposit-approval"
+                                onClick={() => setIsManageUserOpen(false)}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                  Monthly Interest Request
+                              </Link>
+
+                              <Link
+                              to="/containerShipment/sell-request"
+                                onClick={() => setIsManageUserOpen(false)}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              >
+                                Sell Request
+                              </Link>
+
+
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </nav>
                   </div>
-                )}
 
-              </div>}
-              {isUserAdmin(user) && <div className="relative">
-                <button
-                  onClick={() => setBankOpen(!bankOpen)}
-                  className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center gap-2 shadow-sm"
-                >
-                  Bank Details
-                  <span className={`text-xs transition-transform ${bankOpen ? "rotate-180" : ""}`}>
-                    ▼
-                  </span>
-                </button>
-
-                {bankOpen && (
-                  <div className="absolute left-0 mt-2 w-44 bg-white rounded-md shadow-lg py-2 z-50">
-                    <Link
-                      to="/containerShipment/bank-details"
-                      onClick={() => setBankOpen(false)}
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Bank
-                    </Link>
-                  </div>
-                )}
-
-              </div>}
+                </div>
+              }
             </nav>
 
           </div>

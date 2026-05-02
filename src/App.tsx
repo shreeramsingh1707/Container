@@ -37,6 +37,7 @@ import SellContainer from "./pages/SellContainer";
 import WithdrawBankDetailsForm from "./pages/Admin/WithdrawBankDetailsForm";
 import SellMonthlyInterest from "./pages/SellMonthlyInterest";
 import DepositConfirmation from "./pages/DepositConfirmation";
+import AdminWithdrawApproval from "./pages/Adminwithdrawapproval";
 
 export default function App() {
   return (
@@ -66,8 +67,8 @@ export default function App() {
                <Route path="sellMonthlyInterest" element={<SellMonthlyInterest />} />
                <Route path="sell" element={<SellContainer />} />
               <Route path="sell-request" element={<SellRequests />} />
-              <Route path="deposit-approval" element={<SellRequests />} />
-              <Route path="withdrawls" element={<SellRequests />} />
+              <Route path="deposit-approval" element={<AdminWithdrawApproval />} />
+              <Route path="withdrawls" element={<AdminWithdrawApproval />} />
               <Route path="all-user" element={<AdminUsers />} />
               <Route path="active-user" element={<AdminUsers />} />
               <Route path="inactive-user" element={<AdminUsers />} />

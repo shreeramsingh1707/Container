@@ -1490,8 +1490,26 @@ export const sellMonthlyInterest = {
   add: (data: WithdrawRequest): Promise<WithdrawRequest> =>
     apiCall<any>(`/api/container/withdraw/addWithdrawRequest`, 'POST', data).then(
       (response) => response.data?.[0] || response
-    )
- 
-};
+    ),
 
+  approveRequest: (id: number, adminRemark: string): Promise<void> =>
+    apiCall(
+      `/api/container/withdraw/approveWithdrawRequest/${id}?adminRemark=${encodeURIComponent(adminRemark)}`,
+      "PUT"
+    ),
+
+  // Mark as paid / withdrawn
+  markAsPaid: (id: number, adminRemark: string): Promise<void> =>
+    apiCall(
+      `/api/container/withdraw/markWithdrawPaid/${id}?adminRemark=${encodeURIComponent(adminRemark)}`,
+      "PUT"
+    ),
+
+  // Reject a request
+  rejectRequest: (id: number, adminRemark: string): Promise<void> =>
+    apiCall(
+      `/api/container/withdraw/rejectWithdrawRequest/${id}?adminRemark=${encodeURIComponent(adminRemark)}`,
+      "PUT"
+    ),
+};
 
