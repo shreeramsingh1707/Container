@@ -1,21 +1,29 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { QRCodeSVG } from "qrcode.react";
-import { PaymentResponse } from "../services/api";
+import { PaymentResponse, buyContainer } from "../services/api";
 import axios from "axios";
 
 const user = JSON.parse(localStorage.getItem("stylocoin_user") || "{}");
 const userNodeId = user?.nodeId;
-console.log("loggedInPrnId for history",userNodeId)
 
-interface DepositConfirmationData {
+/* ============================
+   TYPES (Corrected)
+============================ */
+interface LocationStateType {
   paymentResponse: PaymentResponse;
   amount: number;
   currency: string;
-  paymentId: string;
-  walletAddress: string;
-  creationTime: string;
-  expiryTime: string;
+  paymentIdValueForPoll: string;
+  formData?: {
+    containerType: "20FT" | "40FT";
+    ownershipType: "SINGLE" | "SHARED";
+    shares: number;
+    priceUsd: number;
+    priceInr: number;
+    roi: number;
+    currency: string;
+  };
 }
 
 interface HistoryItem {
@@ -23,150 +31,191 @@ interface HistoryItem {
   paymentStatus: string;
 }
 
+interface ConfirmationData {
+  paymentResponse: PaymentResponse;
+  amount: number;
+  currency: string;
+  paymentId: string;
+  walletAddress: string;
+  creationTime: string;
+  expiryTime: string;
+  formData?: LocationStateType["formData"];
+}
+
+/* ============================
+   COMPONENT
+============================ */
 export default function DepositConfirmation() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [success, setSuccess] = useState<boolean>(false);
-  const [paymentIdValue,setPaymentIdValue]=useState("");
-  const [confirmationData, setConfirmationData] = useState<DepositConfirmationData | null>(null);
+  const hasSubmittedRef = useRef(false);
 
+  const state = location.state as LocationStateType | null;
+
+  const [confirmationData, setConfirmationData] =
+    useState<ConfirmationData | null>(null);
+
+  const [success, setSuccess] = useState(false);
+  const [paymentIdValue, setPaymentIdValue] = useState("");
+
+  /* ============================
+     FORMAT DATE
+  ============================ */
+  const formatDateTime = (date: Date): string => {
+    return date.toLocaleString();
+  };
+
+  /* ============================
+     INIT DATA
+  ============================ */
+  useEffect(() => {
+    if (!state?.paymentResponse) {
+      // 🔴 If page refreshed or invalid access
+      navigate("/containerShipment/buy");
+      return;
+    }
+
+    const now = new Date();
+    const expiry = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+
+    setPaymentIdValue(state.paymentIdValueForPoll);
+
+    setConfirmationData({
+      paymentResponse: state.paymentResponse,
+      amount: state.amount,
+      currency: state.currency,
+      paymentId: state.paymentResponse.payment_id,
+      walletAddress: state.paymentResponse.pay_address,
+      creationTime: formatDateTime(now),
+      expiryTime: formatDateTime(expiry),
+      formData: state.formData, // ✅ FIXED
+    });
+  }, [state, navigate]);
+
+  /* ============================
+     POLLING PAYMENT STATUS
+  ============================ */
   const pollPaymentStatus = async (paymentId: string) => {
-    console.log("paymentId is setting",paymentId)
     try {
       const res = await axios.get(
         `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/deposit/history/${userNodeId}`
       );
-  
+
       const list: HistoryItem[] = res.data.data;
-  
       const record = list.find((x) => x.paymentId === paymentId);
-  
-      if (record && record.paymentStatus === "SUCCESS") {
+
+      if (
+        record?.paymentStatus === "SUCCESS" &&
+        !hasSubmittedRef.current
+      ) {
+        hasSubmittedRef.current = true;
+
         setSuccess(true);
+
+        clearInterval(intervalRef.current); // ✅ stop polling
+
+        await submitInvestment();
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
-  
+
+  /* ============================
+     START POLLING
+  ============================ */
+  // useEffect(() => {
+  //   if (!paymentIdValue) return;
+
+  //   const interval = setInterval(() => {
+  //     pollPaymentStatus(paymentIdValue);
+  //   }, 4000);
+
+  //   return () => clearInterval(interval);
+  // }, [paymentIdValue]);
+  const intervalRef = useRef<any>(null);
 
   useEffect(() => {
-    // Get deposit data from navigation state
-    const state = location.state as { paymentResponse?: PaymentResponse; amount?: number; currency?: string,paymentIdValueForPoll?:string } | null;
-    
-    if (!state?.paymentResponse) {
-      // If no deposit data, redirect back to deposit page
-      navigate("/StyloCoin/depositFund");
-      return;
-    }
+    if (!paymentIdValue) return;
 
-    // Generate payment ID (using depositPkId or a random string)
-    // const paymentId = state.paymentResponse. 
-    //   ? `DEP${state.deposit.depositPkId.toString().padStart(10, '0')}`
-    //   : generatePaymentId();
+    intervalRef.current = setInterval(() => {
+      pollPaymentStatus(paymentIdValue);
+    }, 4000);
 
-    // Generate wallet address (in real app, this would come from API)
-    // const walletAddress = generateWalletAddress(state.currency || "USDT.BEP20");
+    return () => clearInterval(intervalRef.current);
+  }, [paymentIdValue]);
+  /* ============================
+     SUBMIT INVESTMENT
+  ============================ */
+  const submitInvestment = async () => {
+    if (!confirmationData?.formData) return;
 
-    // Calculate times
-    const now = new Date();
-    const expiry = new Date(now.getTime() + 3 * 60 * 60 * 1000); // 3 hours from now
-    setPaymentIdValue(state.paymentIdValueForPoll ||state.paymentResponse.payment_id)
-    setConfirmationData({
-      paymentResponse: state.paymentResponse,
-      amount: state.amount || state.paymentResponse?.pay_amount || 0,
-      currency: state.currency || state.paymentResponse.pay_currency || "USDT.BSC",
-      paymentId:state.paymentResponse.payment_id,
-      walletAddress:state.paymentResponse.pay_address,
-      creationTime: formatDateTime(now),
-      expiryTime: formatDateTime(expiry),
-    });
-    console.log("Wallet address received:", confirmationData?.walletAddress);
+    const form = confirmationData.formData;
 
-  }, [location.state, navigate]);
+    let investedAmount: number | null = null;
 
+    if (form.currency === "USD") investedAmount = form.priceUsd;
+    else if (form.currency === "INR") investedAmount = form.priceInr;
+    else if (form.currency === "AED")
+      investedAmount = Math.round(form.priceUsd * 3.67);
 
+    const payload = {
+      containerType: form.containerType,
+      ownershipType: form.ownershipType,
+      shares: form.shares,
+      roiPercentage: form.roi,
+      currency: form.currency,
+      investedAmount,
+      userFkId: userNodeId,
+      status: "ACTIVE",
+    };
+
+    await buyContainer.add(payload);
+  };
+
+  /* ============================
+     QR VALUE
+  ============================ */
   const getQRValue = () => {
     const addr = confirmationData?.walletAddress;
-  
-    if (confirmationData?.currency.includes("BSC") || confirmationData?.currency.includes("BEP20")) {
-      return `ethereum:${addr}`; // Trust wallet uses ethereum: for BSC, BEP20 & ERC20
+
+    if (!addr) return "";
+
+    if (
+      confirmationData?.currency.includes("BSC") ||
+      confirmationData?.currency.includes("BEP20")
+    ) {
+      return `ethereum:${addr}`;
     }
-  
+
     if (confirmationData?.currency.includes("TRC20")) {
       return `tron:${addr}`;
     }
-  
+
     if (confirmationData?.currency.includes("BTC")) {
       return `bitcoin:${addr}`;
     }
-    console.log("QR Value sent:", addr);
 
-    return addr; // fallback
-  };
-  
-
-
-  useEffect(() => {
-    if (!paymentIdValue) return; // Wait until value is set
-  
-    console.log("Starting polling for:", paymentIdValue);
-  
-    const interval = setInterval(() => {
-      pollPaymentStatus(paymentIdValue);
-    }, 4000);
-  
-    return () => clearInterval(interval); // Proper cleanup
-  }, [paymentIdValue]);
-  
-
-  // const generatePaymentId = (): string => {
-  //   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  //   let result = "";
-  //   for (let i = 0; i < 26; i++) {
-  //     result += chars.charAt(Math.floor(Math.random() * chars.length));
-  //   }
-  //   return result;
-  // };
-
-  // const generateWalletAddress = (currency: string): string => {
-  //   // In a real app, this would come from the API
-  //   // For now, generate a placeholder address
-  //   const prefix = currency.includes("BTC") ? "1" : currency.includes("ETH") || currency.includes("USDT") ? "0x" : "";
-  //   const randomHex = Array.from({ length: 40 }, () => 
-  //     Math.floor(Math.random() * 16).toString(16)
-  //   ).join("");
-  //   return `${prefix}${randomHex}`;
-  // };
-
-  const formatDateTime = (date: Date): string => {
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    const seconds = String(date.getSeconds()).padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    const displayHours = hours > 12 ? hours - 12 : hours === 0 ? 12 : hours;
-    
-    return `${month}/${day}/${year} ${displayHours}:${minutes}:${seconds} ${ampm}`;
+    return addr;
   };
 
+  /* ============================
+     COPY
+  ============================ */
   const copyToClipboard = (text: string) => {
-    console.log("Wallet address received:", text);
-
     navigator.clipboard.writeText(text);
-    // You could add a toast notification here
   };
 
+  /* ============================
+     LOADING
+  ============================ */
   if (!confirmationData) {
-    return (
-      <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 bg-gray-900 min-h-screen flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
+    return <div>Loading...</div>;
   }
 
+  /* ============================
+     UI
+  ============================ */
   return (
     <div className="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10 bg-gray-900 min-h-screen">
       {/* Important Reminder */}
@@ -268,31 +317,30 @@ export default function DepositConfirmation() {
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="mt-8 text-center">
-        <p className="text-gray-500 text-sm">2025 © Mine Cryptos. All Right Reserved</p>
-      </div>
-       {/* Step 3: Success */}
-       {success && (
-                <div style={styles.successBox}>
-                    <h3>🎉 Deposit Successful!</h3>
-                    <p>Your wallet has been credited.</p>
-                </div>
-            )}
+      {/* SUCCESS */}
+      {success && (
+  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+    <div className="bg-gray-800 p-8 rounded-2xl shadow-2xl text-center max-w-md w-full">
+      
+      <div className="text-5xl mb-4">🎉</div>
+      
+      <h2 className="text-xl font-bold text-white mb-2">
+        Payment Successful!
+      </h2>
+      
+      <p className="text-gray-300 mb-6">
+        Your deposit is confirmed and investment has been created.
+      </p>
+
+      <button
+        onClick={() => navigate(-1)}
+        className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg transition"
+      >
+        Continue
+      </button>
+    </div>
+  </div>
+)}
     </div>
   );
 }
-
-
-// ====================
-// Inline Styles
-// ====================
-const styles: { [key: string]: React.CSSProperties } = {
-  successBox: {
-      background: "#d4ffd4",
-      padding: "20px",
-      borderRadius: "10px",
-      textAlign: "center",
-      marginTop: "20px",
-  },
-};

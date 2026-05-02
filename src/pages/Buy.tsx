@@ -93,6 +93,9 @@ export default function Buy() {
   const [payment, setPayment] = useState<PaymentResponse | null>(null);
   const [qrCode, setQrCode] = useState("");
   const [success, setSuccess] = useState(false);
+  const [investmentDone, setInvestmentDone] = useState(false);
+  const hasSubmittedRef = useRef(false);
+
 
   const [form, setForm] = useState({
     containerType: "" as "20FT" | "40FT" | "",
@@ -168,13 +171,14 @@ export default function Buy() {
       setPayment(paymentResponse);
       // setQrCode(`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${paymentResponse.pay_address}`);
 
-      pollPaymentStatus(paymentResponse.payment_id);
+      // pollPaymentStatus(paymentResponse.payment_id);
       navigate("/containerShipment/depositConfirmation", {
         state: {
           paymentResponse: paymentResponse,
           amount: investedAmount,
           currency: form.currency,
-          paymentIdValueForPoll: paymentResponse.payment_id
+          paymentIdValueForPoll: paymentResponse.payment_id,
+          formData: form   // ✅ ADD THIS
         },
       });
     } catch (err) {
@@ -187,32 +191,70 @@ export default function Buy() {
 
   const intervalRef = useRef<any>(null);
 
-  const pollPaymentStatus = (paymentId: string) => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+  // const pollPaymentStatus = (paymentId: string) => {
+  //   if (intervalRef.current) clearInterval(intervalRef.current);
 
-    intervalRef.current = setInterval(async () => {
-      try {
-        const res = await axios.get(
-          `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/deposit/history/${userNodeId}`
-        );
+  //   intervalRef.current = setInterval(async () => {
+  //     try {
+  //       const res = await axios.get(
+  //         `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/deposit/history/${userNodeId}`
+  //       );
 
-        const record = res.data.data.find((x: HistoryItem) => x.paymentId === paymentId);
+  //       const record = res.data.data.find((x: HistoryItem) => x.paymentId === paymentId);
+  //       console.log("pankaj record", record)
 
-        if (record?.paymentStatus === "SUCCESS") {
-          clearInterval(intervalRef.current);
-          setSuccess(true);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }, 4000);
-  };
+  //       // if (record?.paymentStatus === "SUCCESS") {
+  //       //  await   submitInvestment();   // ✅ clean & safe
+  //       //   clearInterval(intervalRef.current);
+  //       //    setInvestmentDone(true);
+  //       //   setSuccess(true);
 
+  //       // }
+  //       if (!hasSubmittedRef.current) {
+  //         hasSubmittedRef.current = true;
+
+  //         setSuccess(true);
+  //         await submitInvestment();
+  //       }
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   }, 4000);
+  // };
+
+  const pollPaymentStatus = async (paymentId: string) => {
+  try {
+    const res = await axios.get(
+      `http://MineCryptos-env.eba-nsbmtw9i.ap-south-1.elasticbeanstalk.com/api/deposit/history/${userNodeId}`
+    );
+
+    const list: HistoryItem[] = res.data.data;
+    const record = list.find((x) => x.paymentId === paymentId);
+
+    console.log("Polling record:", record);
+
+    if (
+      record?.paymentStatus === "SUCCESS" &&
+      !hasSubmittedRef.current
+    ) {
+      hasSubmittedRef.current = true; // ✅ LOCK
+
+      setSuccess(true);
+
+      clearInterval(intervalRef.current); // ✅ STOP polling
+
+      await submitInvestment();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
   useEffect(() => {
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, []);
+
 
 
   // Helper function to compress and resize image
@@ -440,9 +482,13 @@ export default function Buy() {
       }));
     }
   }, [form.containerType, form.ownershipType, form.shares]);
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    submitInvestment();
+  };
+
+  const submitInvestment = async () => {
     let investedAmount: number | null = null;
 
     if (form.currency === "USD") {
@@ -459,21 +505,14 @@ export default function Buy() {
       shares: form.shares,
       roiPercentage: form.roi,
       currency: form.currency,
-      investedAmount: investedAmount,
+      investedAmount,
       userFkId: userNodeId,
       status: "ACTIVE",
     };
 
-    try {
-      const depositResponse = await buyContainer.add(payload);
-      console.log("investment value--->", depositResponse);
-
-      await fetchContainerData();
-      setIsAddMode(false);
-
-    } catch (error) {
-      console.error("Error buying container:", error);
-    }
+    await buyContainer.add(payload);
+    await fetchContainerData();
+    setIsAddMode(false);
   };
 
 
@@ -699,7 +738,7 @@ export default function Buy() {
                     </TableCell> */}
 
                     <TableCell>
-                      {c.status === "APPROVED" || c.status === "SUCCESS" ? (
+                      {c.status === "ACTIVE" || c.status === "RENTED" ? (
                         <Button
                           size="sm"
                           className="bg-green-600 hover:bg-green-700 text-white"
