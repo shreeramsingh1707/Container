@@ -53,7 +53,7 @@ const api = {
     userFkId: string
   ): Promise<WithdrawRequest[]> => {
     const res = await fetch(
-      `${BASE_URL}/withdraw/getWithdrawRequests?userFkId=${userFkId}&page=1&size=25`
+      `${BASE_URL}/withdraw/getWithdrawRequests?userFkId=${userFkId}&page=1&size=25&filterBy=ALL`
     );
     if (!res.ok) throw new Error("Failed to fetch withdraw history");
     const data = await res.json();
